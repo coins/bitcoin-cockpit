@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Blockchain Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+</head>
+
+<body>
+    <header>
+<img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Blockchain Info</h1>
+        <x-subtitle>Various state info regarding blockchain processing.</x-subtitle>
+        <div id="$bestblockhash" class="item" label="Best Block Hash:"></div>
+        <div id="$chainwork" class="item" label="Chain work:"></div>
+        <div class="row">
+            <div id="$blocks" class="item" label="Blocks Count:"></div>
+            <div id="$headers" class="item" label="Headers Count:"></div>
+            <div id="$difficulty" class="item" label="Difficulty:"></div>
+            <div id="$verificationprogress" class="item" label="Verification Progress:"></div>
+        </div>
+        <div id="$mediantime" class="item" label="Median Time:"></div>
+        <div class="row">
+            <div id="$size_on_disk" class="item" label="Size on disk:"></div>
+            <div id="$prune_target_size" class="item" label="Prune Target Size:"></div>
+            <div id="$chain" class="item" label="Network:"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+function setInfo(info) {
+    console.log(info)
+    $bestblockhash.textContent = info.bestblockhash
+    $blocks.textContent = info.blocks
+    $headers.textContent = info.headers
+    $mediantime.textContent = new Date(info.mediantime * 1000)
+    $size_on_disk.textContent = formatBytesCount(info.size_on_disk)
+    $prune_target_size.textContent = formatBytesCount(info.prune_target_size)
+    $verificationprogress.textContent = formatPercent(info.verificationprogress)
+    $difficulty.textContent = info.difficulty
+    $chainwork.textContent = info.chainwork
+    $chain.textContent = info.chain
+}
+
+function formatBytesCount(bytesCount) {
+    return Math.round(bytesCount / 1e6 * 100) / 100 + ' MB'
+}
+
+function formatPercent(fraction) {
+    return Math.round(fraction * 100 * 100) / 100 + '%'
+}
+
+bitcoinRPC('getblockchaininfo').then(setInfo)
+</script>
+
+
+</html>

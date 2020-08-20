@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Best Block Hash</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+</head>
+
+<body>
+    <header>
+<img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Best Block Hash</h1>
+        <x-subtitle>The hash of the best (tip) block in the most-work fully-validated chain.</x-subtitle>
+        <div id="$error" class="error"></div>
+        <h2>Best Block Hash</h2>
+        <div id="$bestblockhash"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function getBestBlockHash() {
+    let bestblockhash
+
+    try {
+        bestblockhash = await bitcoinRPC('getbestblockhash')
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    $bestblockhash.textContent = bestblockhash
+}
+
+getBestBlockHash()
+</script>
+
+</html>

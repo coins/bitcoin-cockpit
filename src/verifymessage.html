@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Sign Message</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+</head>
+
+<body>
+    <header>
+<img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Verify Message</h1>
+        <x-subtitle>Verify a signed message</x-subtitle>
+        <div class="item" label="Address:">
+            <input id="$address" value="1MAigK8XtjThk5deBKBzJag4P9Ts9Q3MMJ">
+        </div>
+        <div class="item" label="Signature:">
+            <input id="$signature" value="IO9OMkaagTiBazNahJdDcmuGp73jGEP1olv2hG6eoftmVhwNh6PPCMGGD/rQeOM+tAJurWReZhZAr2C0kqdz0K8=">
+        </div>
+		<div class="item" label="Message:">
+            <textarea id="$message">Hello World</textarea>
+        </div>
+
+        <div class="row-reverse">
+        	<button id="$submit">Verify</button>
+        </div>
+
+
+        <h2>Verification Result</h2>
+        <div class="item" id="$isValid"></div>        
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function signMessage() {
+    const message = $message.value
+    const address = $address.value
+    const signature = $signature.value
+    const isValid = await bitcoinRPC('verifymessage', [address, signature, message])
+    $isValid.textContent = isValid ? '✔️  Signature is valid' : '❌  Signature is invalid' 
+}
+
+$submit.addEventListener('click', e => signMessage())
+</script>
+
+</html>

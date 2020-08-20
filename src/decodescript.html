@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Decode Script</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+<img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Decode Script</h1>
+        <x-subtitle>Decode a hex-encoded script.</x-subtitle>
+        <div class="item" label="Paste a raw script:">
+            <textarea id="$input">76a914db4d1141d0048b1ed15839d0b7a4c488cd368b0e88ac
+            </textarea>
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Decoded Script</h2>
+        <div id="$address" class="item" label="Address:"></div>
+        <div id="$p2sh" class="item" label="P2SH address:"></div>
+        <div id="$segwitAddress" class="item" label="Segwit address:"></div>
+        <div id="$asm" class="item" label="ASM:"></div>
+        <div class="row">
+            <div id="$type" class="item" label="Type:"></div>
+            <div id="$reqSigs" class="item" label="Required Sigs:"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+async function decodeRawTransaction(rawTransaction) {
+    resetUI()
+    rawTransaction = rawTransaction.trim()
+
+
+    let decodedScript
+    try {
+        decodedScript = await bitcoinRPC('decodescript', [rawTransaction])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(decodedScript)
+
+    $asm.textContent = decodedScript.asm
+    $p2sh.textContent = decodedScript.p2sh
+    $reqSigs.textContent = decodedScript.reqSigs
+    $type.textContent = decodedScript.type
+    if (decodedScript.addresses) {
+        $address.textContent = decodedScript.addresses[0]
+        $segwitAddress.textContent = decodedScript.segwit.addresses[0]
+    }
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $asm.textContent = ''
+    $address.textContent = ''
+    $p2sh.textContent = ''
+    $reqSigs.textContent = ''
+    $type.textContent = ''
+    $segwitAddress.textContent = ''
+}
+
+$input.addEventListener('input', e => decodeRawTransaction(e.target.value))
+</script>
+
+</html>

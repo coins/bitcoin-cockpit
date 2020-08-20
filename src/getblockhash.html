@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Block Hash</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+<img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Block Hash</h1>
+        <x-subtitle>Returns hash of block in best-block-chain at height provided.</x-subtitle>
+        <div class="item" label="Enter a block height">
+            <input id="$blockHash" placeholder="block height" type="number" min="0" max="9000000">
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Block Hash</h2>
+        <div id="$hash" class="item" label="Block Hash"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+async function decodeRawTransaction() {
+    resetUI()
+    const blockHash = Number($blockHash.value)
+
+
+    let block
+    try {
+        block = await bitcoinRPC('getblockhash', [blockHash])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(block)
+        $hash.textContent = block
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $hash.textContent = ''
+}
+
+$blockHash.addEventListener('input', e => decodeRawTransaction(e.target.value))
+
+function formatBytesCount(bytesCount) {
+    return Math.round(bytesCount / 1e6 * 100) / 100 + ' MB'
+}
+</script>
+
+</html>

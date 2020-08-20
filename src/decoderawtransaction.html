@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Decode Raw Transaction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 200px;
+        padding: 8px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Decode Raw Transaction</h1>
+        <div class="item">
+            Return an object representing the serialized, hex-encoded transaction.
+        </div>
+        <div id="$bestblockhash" class="item" label="Paste a raw transaction:">
+            <textarea id="$input">01000000017967a5185e907a25225574544c31f7b059c1a191d65b53dcc1554d339c4f9efc010000006a47304402206a2eb16b7b92051d0fa38c133e67684ed064effada1d7f925c842da401d4f22702201f196b10e6e4b4a9fff948e5c5d71ec5da53e90529c8dbd122bff2b1d21dc8a90121039b7bcd0824b9a9164f7ba098408e63e5b7e3cf90835cceb19868f54f8961a825ffffffff014baf2100000000001976a914db4d1141d0048b1ed15839d0b7a4c488cd368b0e88ac00000000
+        	</textarea>
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Decoded Transaction</h2>
+        <div id="$txid" class="item" label="Transaction ID:"></div>
+        <div class="row">
+            <div id="$version" class="item" label="Version:"></div>
+            <div id="$locktime" class="item" label="Lock Time:"></div>
+            <div id="$size" class="item" label="Size:" title="Size of the transaction"></div>
+            <div id="$vsize" class="item" label="vSize:" title="Virtual size of the transaction. An alternative measurement, with one vbyte being equal to four weight units."></div>
+        </div>
+        <h3>Transaction Inputs</h3>
+        <div id="$vin"></div>
+        <h3>Transaction Outputs</h3>
+        <div id="$vout"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function decodeRawTransaction(rawTransaction) {
+    resetUI()
+
+    rawTransaction = rawTransaction.trim()
+
+    let decodedTransaction
+    try {
+        decodedTransaction = await bitcoinRPC('decoderawtransaction', [rawTransaction])
+    } catch (e) {
+        $error.textContent = e
+    }
+    console.log(decodedTransaction)
+
+    $txid.textContent = decodedTransaction.txid
+    $version.textContent = decodedTransaction.version
+    $locktime.textContent = decodedTransaction.locktime
+    $size.textContent = decodedTransaction.size + ' bytes'
+    $vsize.textContent = decodedTransaction.size + ' vBytes'
+
+
+
+    decodedTransaction.vin.forEach((input, index) => $vin.append(inputToHtml(input, index)))
+    decodedTransaction.vout.forEach((output, index) => $vout.append(outputToHtml(output, index)))
+}
+
+function inputToHtml(input, index) {
+    const $input = document.createElement('div')
+
+    $input.innerHTML = `
+	<h4>Input ${index+1}</h4>	
+	<div class="row">
+		<div class="item" label="TXID:">${input.txid}</div>
+		<div class="item" label="vout:">${input.vout}</div>
+	</div>
+	<div class="item" label="Sequence:">${input.sequence}</div>
+	<div class="item" label="ScriptSig ASM:">${input.scriptSig.asm}</div>
+	<div class="item" label="ScriptSig hex:">${input.scriptSig.hex}</div>
+	`
+    return $input
+}
+
+function outputToHtml(output, index) {
+    const $output = document.createElement('div')
+
+    $output.innerHTML = `
+	<h4>Output ${index+1}</h4>	
+	<div class="row">
+		<div class="item" label="Value:">${output.value} BTC</div>
+		<div class="item" label="Address:">${output.scriptPubKey.addresses[0]}</div>
+	</div>
+	<div class="item" label="scriptPubKey ASM:">${output.scriptPubKey.asm}</div>
+	<div class="item" label="scriptPubKey hex:">${output.scriptPubKey.hex}</div>
+	<div class="row">
+		<div class="item" label="Script Type:">${output.scriptPubKey.type}</div>
+		<div class="item" label="Required Sigs:">${output.scriptPubKey.reqSigs}</div>
+	</div>
+	`
+    return $output
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $txid.textContent = ''
+    $version.textContent = ''
+    $locktime.textContent = ''
+    $size.textContent = ''
+    $vsize.textContent = ''
+    $vin.innerHTML = ''
+    $vout.innerHTML = ''
+}
+
+$input.addEventListener('input', e => decodeRawTransaction(e.target.value))
+</script>
+
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Send Raw Transaction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 160px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+<img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Send Raw Transaction</h1>
+        <x-subtitle>Submit a raw transaction (serialized, hex-encoded) to local node and network.</x-subtitle>
+        <div class="item" label="Raw transaction">
+            <textarea id="$input" placeholder="Paste a hex encoded transaction"></textarea>
+        </div>
+        <h2>Result</h2>
+        <div class="error" id="$error"></div>
+        <div class="item" label="Result" id="$result"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function sendRawTransaction() {
+    resetUI()
+
+    const rawTransaction = $input.value.trim()
+
+    let result
+    try {
+        result = await bitcoinRPC('sendrawtransaction', [rawTransaction])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(result)
+
+    $result.textContent = result
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $result.textContent = ''
+}
+
+$input.addEventListener('input', e => sendRawTransaction())
+</script>
+
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Sign Message</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <script src="static/bitcoin-rpc.js"></script>
+</head>
+
+<body>
+    <header>
+<img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Sign Message with Private Key</h1>
+        <x-subtitle>
+            Sign a message with the private key of an address.
+        </x-subtitle>
+        <div class="item" label="Private Key:">
+            <input id="$privkey" value="KwmmZm5fuhMFBhwVQwoUjGEmNsnRreLFzkeoKCVr55Jr53X6FrgH">
+        </div>
+        <div class="item" label="Message:">
+            <textarea id="$message">Hello World</textarea>
+        </div>
+        <div class="row-reverse">
+            <button id="$submit">Sign</button>
+        </div>
+        <div id="$error" class="error"></div>
+        <h2>Signed Message</h2>
+        <div id="$signedMsg" class="item" label="Signed Message (base64 encoded)"></div>
+    </main>
+</body>
+<script>
+async function signMessage() {
+    resetUI()
+    const message = $message.value
+    const privkey = $privkey.value
+
+    // Make RPC call
+    let signedMsg;
+    try {
+    	// success
+        signedMsg = await bitcoinRPC('signmessagewithprivkey', [privkey, message])
+    } catch (e) {
+    	// handle error
+        $error.textContent = e
+        return
+    }
+
+    $signedMsg.textContent = signedMsg
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $signedMsg.textContent = ''
+}
+
+$submit.addEventListener('click', e => signMessage())
+</script>
+
+</html>
