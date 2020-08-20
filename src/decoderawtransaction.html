@@ -21,20 +21,23 @@
     <main>
         <h1>Decode Raw Transaction</h1>
         <div class="item">
-            Return an object representing the serialized, hex-encoded transaction.
+            Returns an object representing the serialized, hex-encoded transaction.
         </div>
-        <div id="$bestblockhash" class="item" label="Paste a raw transaction:">
-            <textarea id="$input">01000000017967a5185e907a25225574544c31f7b059c1a191d65b53dcc1554d339c4f9efc010000006a47304402206a2eb16b7b92051d0fa38c133e67684ed064effada1d7f925c842da401d4f22702201f196b10e6e4b4a9fff948e5c5d71ec5da53e90529c8dbd122bff2b1d21dc8a90121039b7bcd0824b9a9164f7ba098408e63e5b7e3cf90835cceb19868f54f8961a825ffffffff014baf2100000000001976a914db4d1141d0048b1ed15839d0b7a4c488cd368b0e88ac00000000
-        	</textarea>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
+        <div class="item" label="Raw transaction">
+            <textarea id="$rawTransaction" placeholder="Paste raw transaction here"></textarea>
         </div>
         <div class="error" id="$error"></div>
         <h2>Decoded Transaction</h2>
-        <div id="$txid" class="item" label="Transaction ID:"></div>
+        <div id="$txid" class="item" label="Transaction ID"></div>
         <div class="row">
-            <div id="$version" class="item" label="Version:"></div>
-            <div id="$locktime" class="item" label="Lock Time:"></div>
-            <div id="$size" class="item" label="Size:" title="Size of the transaction"></div>
-            <div id="$vsize" class="item" label="vSize:" title="Virtual size of the transaction. An alternative measurement, with one vbyte being equal to four weight units."></div>
+            <div id="$version" class="item" label="Version"></div>
+            <div id="$locktime" class="item" label="Lock Time"></div>
+            <div id="$size" class="item" label="Size" title="Size of the transaction"></div>
+            <div id="$vsize" class="item" label="vSize" title="Virtual size of the transaction. An alternative measurement, with one vbyte being equal to four weight units."></div>
         </div>
         <h3>Transaction Inputs</h3>
         <div id="$vin"></div>
@@ -44,10 +47,10 @@
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script>
-async function decodeRawTransaction(rawTransaction) {
+async function decodeRawTransaction() {
     resetUI()
 
-    rawTransaction = rawTransaction.trim()
+    rawTransaction = $rawTransaction.value.trim()
 
     let decodedTransaction
     try {
@@ -73,15 +76,15 @@ function inputToHtml(input, index) {
     const $input = document.createElement('div')
 
     $input.innerHTML = `
-	<h4>Input ${index+1}</h4>	
-	<div class="row">
-		<div class="item" label="TXID:">${input.txid}</div>
-		<div class="item" label="vout:">${input.vout}</div>
-	</div>
-	<div class="item" label="Sequence:">${input.sequence}</div>
-	<div class="item" label="ScriptSig ASM:">${input.scriptSig.asm}</div>
-	<div class="item" label="ScriptSig hex:">${input.scriptSig.hex}</div>
-	`
+    <h4>Input ${index+1}</h4>   
+    <div class="row">
+        <div class="item" label="TXID">${input.txid}</div>
+        <div class="item" label="vout">${input.vout}</div>
+    </div>
+    <div class="item" label="Sequence">${input.sequence}</div>
+    <div class="item" label="ScriptSig ASM">${input.scriptSig.asm}</div>
+    <div class="item" label="ScriptSig hex">${input.scriptSig.hex}</div>
+    `
     return $input
 }
 
@@ -89,18 +92,18 @@ function outputToHtml(output, index) {
     const $output = document.createElement('div')
 
     $output.innerHTML = `
-	<h4>Output ${index+1}</h4>	
-	<div class="row">
-		<div class="item" label="Value:">${output.value} BTC</div>
-		<div class="item" label="Address:">${output.scriptPubKey.addresses[0]}</div>
-	</div>
-	<div class="item" label="scriptPubKey ASM:">${output.scriptPubKey.asm}</div>
-	<div class="item" label="scriptPubKey hex:">${output.scriptPubKey.hex}</div>
-	<div class="row">
-		<div class="item" label="Script Type:">${output.scriptPubKey.type}</div>
-		<div class="item" label="Required Sigs:">${output.scriptPubKey.reqSigs}</div>
-	</div>
-	`
+    <h4>Output ${index+1}</h4>  
+    <div class="row">
+        <div class="item" label="Value">${output.value} BTC</div>
+        <div class="item" label="Address">${output.scriptPubKey.addresses[0]}</div>
+    </div>
+    <div class="item" label="scriptPubKey ASM">${output.scriptPubKey.asm}</div>
+    <div class="item" label="scriptPubKey hex">${output.scriptPubKey.hex}</div>
+    <div class="row">
+        <div class="item" label="Script Type">${output.scriptPubKey.type}</div>
+        <div class="item" label="Required Sigs">${output.scriptPubKey.reqSigs}</div>
+    </div>
+    `
     return $output
 }
 
@@ -115,7 +118,24 @@ function resetUI() {
     $vout.innerHTML = ''
 }
 
-$input.addEventListener('input', e => decodeRawTransaction(e.target.value))
+$rawTransaction.addEventListener('input', e => decodeRawTransaction())
+
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $rawTransaction.value = '01000000017967a5185e907a25225574544c31f7b059c1a191d65b53dcc1554d339c4f9efc010000006a47304402206a2eb16b7b92051d0fa38c133e67684ed064effada1d7f925c842da401d4f22702201f196b10e6e4b4a9fff948e5c5d71ec5da53e90529c8dbd122bff2b1d21dc8a90121039b7bcd0824b9a9164f7ba098408e63e5b7e3cf90835cceb19868f54f8961a825ffffffff014baf2100000000001976a914db4d1141d0048b1ed15839d0b7a4c488cd368b0e88ac00000000'
+    decodeRawTransaction()
+})
+
+$example2.addEventListener('click', _ => {
+    $rawTransaction.value = '020000000182fd0fd07b3cd9092f562d349bf390b377240b2ef3d5f6757d2e62529ddc350a00000000fd470200483045022100a86f50c44c8c8fd88813a3542c7eb8479be1925afed661b94a89bfd71cfe0e8a022014d12f1032a9d6de04af9cda769e0d7496bd92634867fb62b5ba238eec9bcccc0101ff01ff47304402206d83b726ee9777428412e90159d0338a8f5ab86e8aa3b00fa9e59b5c2416f92c02200fc1da9c55f20caae38f19a7fe59151b7829e507d8f3bce0d811033593ca10280101ff4dac01534c53ff0488b21e02ca995721800000005785114a789d8a02574c827a19ebbea5a78d81c3e851111946a1c49c4b218cb6039342c3b023482694dc422e1707b0e431d327727d8731a282b61d32e0c54967bb000000004c53ff0488b21e0254729f4680000000f02c513b9a59bfe5eecae28ef5c5a9be537c955a150a8d2ea7cc5f16f93e220b03a744e1b58a340351c6d7f25da27fddfd19f9707aa7c0886f4570441dd495cb88000000004c53ff0488b21e023566ec3f800000003fa3c0eecf2d2f3c957880508202099a3869e3a40ace989e36e0a5eafdc7fdff03fecbb71ce6cf5111a2d8482972fdc90abd428fb6eb46afcd8ac3b5b131d26cf9000000004c53ff0488b21e025ea2409d8000000043a6315dfc023afaddc3575cea424455df43e9ed2ace786518de25bd8c5025f902f3648def790515a70c26057516355195d22554427968d8ce6f10aef94a16ec98000000004c53ff0488b21e02bf1546f480000000bc791d5ea11b9cea99845ec57ec9e74c310d5dde1e3c11fefe32db2c2f4c40c802bcf4e49312dd9d9fe24500bd772978c8e16e6a18eee13452d8e044382b6d73af0000000055aefdffffff014e1e0000000000001976a914c7258184accf03b69026a6f7fb6d2badefab4d9288ac3fd40900'
+    decodeRawTransaction()
+})
+
 </script>
 
 </html>

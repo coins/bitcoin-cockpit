@@ -1,4 +1,14 @@
-body, textarea, input {
+:root{
+    --primary-color: #4285f4;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body,
+textarea,
+input {
     font-family: -apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
@@ -7,57 +17,11 @@ body {
     margin: 0;
 }
 
-.item {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 24px;
-    max-width: 100%;
-    word-break: break-word;
-}
-
-.item:before {
-    content: attr(label);
-    font-size: 13px;
-    color: rgba(0, 0, 0, 0.8);
-    margin-bottom: 2px;
-}
-
-.item:empty:before {
-    content: '';
-    display:none;
-}
-
-.item:empty{
-    display: none;
-}
-
-.row {
-    display: flex;
-    flex-direction: row;
-}
-
-.row>* {
-    margin-right: 40px;
-}
-
-.row>*:last-child {
-    margin-right: 0;
-}
-
-.row-reverse {
-    display: flex;
-    flex-direction: row-reverse;
-}
-
 main {
     width: 100%;
     max-width: 720px;
     margin: 0 auto;
     padding: 0 8px 64px;
-}
-
-* {
-    box-sizing: border-box;
 }
 
 header {
@@ -72,8 +36,15 @@ header {
     color: white;
 }
 
+h1,
+h2,
+h3,
+h4 {
+    font-weight: 400;
+}
+
 h1 {
-    font-size: 40px;
+    font-size: 32px;
     padding: 32px 0 0;
     margin-bottom: 8px;
 }
@@ -83,20 +54,12 @@ h2 {
     padding: 32px 0 0;
 }
 
-h1,
-h2,
-h3,
-h4 {
-    font-weight: 400;
-}
-
 x-subtitle {
     display: block;
     margin-bottom: 56px;
-    font-size: 20px;
+    font-size: 18px;
     opacity: 0.7;
 }
-
 
 textarea,
 input,
@@ -132,11 +95,59 @@ button {
     white-space: nowrap;
     cursor: pointer;
     user-select: none;
-    background: #4285f4;
+    background: var(--primary-color);
     color: white;
     border-radius: 4px;
     transition: transform 200ms;
     border-radius: 100px;
+}
+
+a{
+    color:var(--primary-color);
+    cursor: pointer;
+    font-size: 13px;
+}
+
+
+.item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+    max-width: 100%;
+    word-break: break-word;
+}
+
+.item:before {
+    content: attr(label);
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.8);
+    margin-bottom: 2px;
+}
+
+.item:empty {
+    display: none;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.row>* {
+    margin-right: 40px;
+}
+
+.row>*:last-child {
+    margin-right: 0;
+}
+
+.row-reverse {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.row-reverse>* {
+    margin-left: 24px;
 }
 
 .error:not(:empty):before {

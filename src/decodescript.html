@@ -20,9 +20,12 @@
     <main>
         <h1>Decode Script</h1>
         <x-subtitle>Decode a hex-encoded script.</x-subtitle>
-        <div class="item" label="Paste a raw script:">
-            <textarea id="$input">76a914db4d1141d0048b1ed15839d0b7a4c488cd368b0e88ac
-            </textarea>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
+        <div class="item" label="Raw script">
+            <textarea id="$rawScript" placeholder="Paste a raw script here"></textarea>
         </div>
         <div class="error" id="$error"></div>
         <h2>Decoded Script</h2>
@@ -38,14 +41,14 @@
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script type="text/javascript">
-async function decodeRawTransaction(rawTransaction) {
+async function decodeRawScript() {
     resetUI()
-    rawTransaction = rawTransaction.trim()
+    rawScript = $rawScript.value.trim()
 
 
     let decodedScript
     try {
-        decodedScript = await bitcoinRPC('decodescript', [rawTransaction])
+        decodedScript = await bitcoinRPC('decodescript', [rawScript])
     } catch (e) {
         $error.textContent = e
         return
@@ -73,7 +76,23 @@ function resetUI() {
     $segwitAddress.textContent = ''
 }
 
-$input.addEventListener('input', e => decodeRawTransaction(e.target.value))
+$rawScript.addEventListener('input', e => decodeRawScript())
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $rawScript.value = '76a914db4d1141d0048b1ed15839d0b7a4c488cd368b0e88ac'
+    decodeRawScript()
+})
+
+$example2.addEventListener('click', _ => {
+    $rawScript.value = '76a914db4d1141d0048b1ed15839d0b7a4c488cd368b0e88ac'
+    decodeRawScript()
+})
+
 </script>
 
 </html>

@@ -1,2 +1,2 @@
-# bitcoin-cockpit
-A simple GUI for bitcoin RPCs
+# Bitcoin Cockpit
+A simple GUI for bitcoin RPCs.

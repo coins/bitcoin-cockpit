@@ -11,18 +11,22 @@
 
 <body>
     <header>
-<img src="static/bitcoin_logo.svg" width="120">
+        <img src="static/bitcoin_logo.svg" width="120">
     </header>
     <main>
         <h1>Sign Message with Private Key</h1>
         <x-subtitle>
             Sign a message with the private key of an address.
         </x-subtitle>
-        <div class="item" label="Private Key:">
-            <input id="$privkey" value="KwmmZm5fuhMFBhwVQwoUjGEmNsnRreLFzkeoKCVr55Jr53X6FrgH">
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
         </div>
-        <div class="item" label="Message:">
-            <textarea id="$message">Hello World</textarea>
+        <div class="item" label="Private Key">
+            <input id="$privkey" placeholder="Enter a private key">
+        </div>
+        <div class="item" label="Message">
+            <textarea id="$message" placeholder="Enter a message"></textarea>
         </div>
         <div class="row-reverse">
             <button id="$submit">Sign</button>
@@ -41,10 +45,10 @@ async function signMessage() {
     // Make RPC call
     let signedMsg;
     try {
-    	// success
+        // success
         signedMsg = await bitcoinRPC('signmessagewithprivkey', [privkey, message])
     } catch (e) {
-    	// handle error
+        // handle error
         $error.textContent = e
         return
     }
@@ -58,6 +62,26 @@ function resetUI() {
 }
 
 $submit.addEventListener('click', e => signMessage())
+
+
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $privkey.value = 'KwmmZm5fuhMFBhwVQwoUjGEmNsnRreLFzkeoKCVr55Jr53X6FrgH'
+    $message.value = 'Hello World'
+    signMessage()
+})
+
+$example2.addEventListener('click', _ => {
+    $privkey.value = 'KwmmZm5fuhMFBhwVQwoUjGEmNsnRreLFzkeoKCVr55Jr53X6FrgH'
+    $message.value = 'I love Bitcoin'
+    signMessage()
+})
+
 </script>
 
 </html>

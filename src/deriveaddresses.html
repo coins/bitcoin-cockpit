@@ -21,13 +21,17 @@
 
 <body>
     <header>
-<img src="static/bitcoin_logo.svg" width="120">
+        <img src="static/bitcoin_logo.svg" width="120">
     </header>
     <main>
         <h1>Derive Addresses</h1>
         <x-subtitle>Derives one or more addresses corresponding to an output descriptor.</x-subtitle>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
         <div class="item" label="Descriptor:">
-            <textarea id="$descriptor">sh(sortedmulti(3,xpub6BG19sAxMMdQP1mcXaDYqkDdoeUQtzw7DHjr9M1rh3vJpcFJJbNUidMsuMbfvMbJ1H9K7boBvaMy1Q1jHa9UXTmzxg3KDto7h6pZpYTrM6Q/0/*,xpub6ATyc4yRJ1vo1JT4Ro5asfBEpEVfFGBFMuHvJhBsbbvGe9pctVarxsPJpeAnsV1zZpzrZ8NFTby9ihMysjsHkHTnDLr9sY6x8k3PuRZF524/0/*,xpub6AAQ7FoVcjpeP8iRFDWRySaEGdLyCA7wHKVGXknKawVkL5dVA3kgrjRfeA1a7DsfSk7MqGEYvv7cCMaK73hCUzfe2tDuc8aNGmXeiSVq43R/0/*,xprv9s21ZrQH143K2bpgrXNezh2wQLmbLXZqvxX21GdCpyJZjvpgy1Y1EMaXCuALw9GWgBi4JVftSdEZTTdEPnAUnTzyCPy88TxF5dvJHsLy14x/0'/0'/0/*,xpub6APdkAEeCs4tv52hCr1tvGTmsN1V3dXpFnBoyaYkrmJ78rosCUuv1pAUoQWPy7R9MubfsaKUQk6x6xvghRXDw4DP4mwNcMs7UVSrDGPmyST/0/*))</textarea>
+            <textarea id="$descriptor" placeholder="Paste a descriptor here"></textarea>
         </div>
         <div class="row">
             <div class="item" label="Start Index">
@@ -78,7 +82,7 @@ async function deriveAddresses() {
 
     try {
         if (isRange)
-            addresses = await bitcoinRPC('deriveaddresses', 
+            addresses = await bitcoinRPC('deriveaddresses',
                 [checkedDescriptor, [startIndex, endIndex]])
         else
             addresses = await bitcoinRPC('deriveaddresses', [checkedDescriptor])
@@ -98,6 +102,24 @@ async function deriveAddresses() {
 }
 
 $submit.addEventListener('click', e => deriveAddresses())
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $descriptor.value = `sh(wsh(multi(1,03f28773c2d975288bc7d1d205c3748651b075fbc6610e58cddeeddf8f19405aa8,03499fdf9e895e719cfd64e67f07d38e3226aa7b63678949e6e49b241a60e823e4,02d7924d4f7d43ea965a465ae3095ff41131e5946f3c85f79e44adbcf8e27e080e)))`
+    deriveAddresses()
+})
+
+$example2.addEventListener('click', _ => {
+    $descriptor.value = `sh(sortedmulti(3,xpub6BG19sAxMMdQP1mcXaDYqkDdoeUQtzw7DHjr9M1rh3vJpcFJJbNUidMsuMbfvMbJ1H9K7boBvaMy1Q1jHa9UXTmzxg3KDto7h6pZpYTrM6Q/0/*,xpub6ATyc4yRJ1vo1JT4Ro5asfBEpEVfFGBFMuHvJhBsbbvGe9pctVarxsPJpeAnsV1zZpzrZ8NFTby9ihMysjsHkHTnDLr9sY6x8k3PuRZF524/0/*,xpub6AAQ7FoVcjpeP8iRFDWRySaEGdLyCA7wHKVGXknKawVkL5dVA3kgrjRfeA1a7DsfSk7MqGEYvv7cCMaK73hCUzfe2tDuc8aNGmXeiSVq43R/0/*,xprv9s21ZrQH143K2bpgrXNezh2wQLmbLXZqvxX21GdCpyJZjvpgy1Y1EMaXCuALw9GWgBi4JVftSdEZTTdEPnAUnTzyCPy88TxF5dvJHsLy14x/0'/0'/0/*,xpub6APdkAEeCs4tv52hCr1tvGTmsN1V3dXpFnBoyaYkrmJ78rosCUuv1pAUoQWPy7R9MubfsaKUQk6x6xvghRXDw4DP4mwNcMs7UVSrDGPmyST/0/*))`
+    deriveAddresses()
+})
+
+
+
 </script>
 
 </html>

@@ -20,8 +20,12 @@
     <main>
         <h1>Get Block Header</h1>
         <x-subtitle>Returns the block header of a given block hash.</x-subtitle>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
         <div class="item" label="Block hash:">
-            <input id="$blockId" value="000000000000000000020ff2893a89579d3e3db4ae4abbea3b021a11d73a92b3">
+            <input id="$blockId" placeholder="Enter a block hash">
         </div>
         <div class="item" label="Verbosity">
             <select id="$verbosity">
@@ -51,11 +55,13 @@
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script type="text/javascript">
-async function decodeRawTransaction() {
+async function getBlockHeader() {
     resetUI()
     const blockId = $blockId.value
     const verbosity = Boolean(Number($verbosity.value))
 
+    if(blockId == '')
+        return
 
     let block
     try {
@@ -98,12 +104,29 @@ function resetUI() {
     $versionHex.textContent = ''
 }
 
-$blockId.addEventListener('input', e => decodeRawTransaction(e.target.value))
-$verbosity.addEventListener('input', e => decodeRawTransaction(e.target.value))
+$blockId.addEventListener('input', e => getBlockHeader())
+$verbosity.addEventListener('input', e => getBlockHeader())
 
 function formatBytesCount(bytesCount) {
     return Math.round(bytesCount / 1e6 * 100) / 100 + ' MB'
 }
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $blockId.value = '000000000000000000020ff2893a89579d3e3db4ae4abbea3b021a11d73a92b3'
+    getBlockHeader()
+})
+
+$example2.addEventListener('click', _ => {
+    $blockId.value = '00000000000000000008445ce0f0f34c543195c07d599af3452ee3a6cfc1c03d'
+    getBlockHeader()
+})
+
+
 </script>
 
 </html>
