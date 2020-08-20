@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>List Labels</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>List Labels</h1>
+        <x-subtitle>Returns the list of all labels, or labels that are assigned to addresses with a specific purpose.</x-subtitle>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
+        <div class="item" label="Purpose">
+            <select id="$purpose">
+                <option value="">Any</option>
+                <option value="send">Send</option>
+                <option value="receive">Receive</option>
+            </select>
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Labels</h2>
+        <div id="$labels"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+async function getLabels() {
+    resetUI()
+    const purpose = $purpose.value
+
+
+    let labels
+    try {
+        labels = await bitcoinRPC('listlabels', [purpose])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(labels)
+
+    labels.forEach((label, index) => {
+        const $item = document.createElement('div')
+        $item.className = 'item'
+        $item.setAttribute('label', 'Label ' + index)
+        $item.textContent = label ? label : '(unnamed)'
+        $labels.append($item)
+    })
+
+    if (labels.length == 0) {
+        if (purpose)
+            $labels.textContent = `No labels with purpose "${purpose}".`
+        else
+            $labels.textContent = `No labels yet.`
+    }
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $labels.innerHTML = ''
+}
+
+$purpose.addEventListener('input', e => getLabels())
+getLabels()
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $purpose.value = 'send'
+    getLabels()
+})
+
+$example2.addEventListener('click', _ => {
+    $purpose.value = 'receive'
+    getLabels()
+})
+</script>
+
+</html>
