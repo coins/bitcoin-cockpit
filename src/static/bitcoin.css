@@ -100,6 +100,10 @@ button {
     border-radius: 4px;
     transition: transform 200ms;
     border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-rendering: optimizeLegibility;
+    color: rgba(255,255,255,0.85);
 }
 
 a{
