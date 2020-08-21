@@ -1,4 +1,4 @@
-:root{
+:root {
     --primary-color: #4285f4;
 }
 
@@ -59,6 +59,7 @@ x-subtitle {
     margin-bottom: 56px;
     font-size: 18px;
     opacity: 0.7;
+    line-height: 24px;
 }
 
 textarea,
@@ -103,15 +104,18 @@ button {
     text-transform: uppercase;
     letter-spacing: 0.12em;
     text-rendering: optimizeLegibility;
-    color: rgba(255,255,255,0.85);
+    color: rgba(255, 255, 255, 0.85);
 }
 
-a{
-    color:var(--primary-color);
+a {
+    color: var(--primary-color);
     cursor: pointer;
     font-size: 13px;
 }
 
+summary {
+    margin-bottom: 16px;
+}
 
 .item {
     display: flex;

@@ -24,8 +24,8 @@
             <a id="$example2">Example 2</a>
             <a id="$example1">Example 1</a>
         </div>
-        <div class="item" label="Enter a block height">
-            <input id="$blockHash" placeholder="block height" type="number" min="0" max="9000000">
+        <div class="item" label="Block height">
+            <input id="$blockHash" type="number" min="0" max="9000000" placeholder="Enter a block height">
         </div>
         <div class="error" id="$error"></div>
         <h2>Block Hash</h2>
@@ -33,7 +33,7 @@
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
-<script type="text/javascript">
+<script>
 async function getBlockHash() {
     resetUI()
     const blockHash = Number($blockHash.value)

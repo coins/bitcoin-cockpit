@@ -6,11 +6,6 @@
     <title>List Labels</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
-    <style type="text/css">
-    textarea {
-        height: 120px;
-    }
-    </style>
 </head>
 
 <body>
@@ -41,7 +36,6 @@
 async function getLabels() {
     resetUI()
     const purpose = $purpose.value
-
 
     let labels
     try {
@@ -75,6 +69,7 @@ function resetUI() {
 }
 
 $purpose.addEventListener('input', e => getLabels())
+
 getLabels()
 
 /**

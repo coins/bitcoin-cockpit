@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Send to Address</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Send to Address</h1>
+        <x-subtitle>
+            Send an amount to a given address.<br>
+            Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
+        </x-subtitle>
+        <div class="row-reverse">
+            <a id="$example1">Example</a>
+        </div>
+        <div class="item" label="Address" title="The bitcoin address to send to.">
+            <input id="$address" min="0" max="9000000" placeholder="Enter an address">
+        </div>
+        <div class="item" label="BTC Amount" title="The amount in BTC to send. eg 0.1">
+            <input id="$amount" type="number" min="0" max="9000000" step="0.0001" placeholder="Enter a Bitcoin amount">
+        </div>
+        <details>
+            <summary>Options</summary>
+            <div class="item" label="Comment" title="A comment used to store what the transaction is for. This is not part of the transaction, just kept in your wallet.">
+                <input id="$comment" placeholder="Enter a comment">
+            </div>
+            <div class="item" label="Name recipient address" title="A comment to store the name of the person or organization to which you're sending the transaction. This is not part of the transaction, just kept in your wallet.">
+                <input id="$comment_to" placeholder="Enter a name for the recipient address">
+            </div>
+            <div class="row">
+                <div class="item" title="Allow this transaction to be replaced by a transaction with higher fees via BIP 125">
+                    <label>
+                        <input id="$replaceable" type="checkbox">Replaceable
+                    </label>
+                </div>
+                <div class="item" title="The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field.">
+                    <label>
+                        <input id="$subtractfeefromamount" type="checkbox">Subtract fee from amount
+                    </label>
+                </div>
+            </div>
+        </details>
+        <div class="row-reverse">
+            <button id="$submit">Send</button>
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Transaction Id</h2>
+        <div id="$txid" class="item" label="Transaction Id"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function sendToAddress() {
+    resetUI()
+    const address = $address.value
+    const amount = Number($amount.value)
+    const comment = $comment.value
+    const comment_to = $comment_to.value
+    const subtractfeefromamount = $subtractfeefromamount.checked
+    const replaceable = $replaceable.checked
+
+
+    if (!confirm(`Send ${amount} BTC to ${address}?`))
+        return
+
+    let txid
+    try {
+        txid = await bitcoinRPC('sendtoaddress', [
+                        address, 
+                        amount, 
+                        comment, 
+                        comment_to, 
+                        subtractfeefromamount,
+                        replaceable
+                        ])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(txid)
+    $txid.textContent = txid
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $txid.textContent = ''
+}
+
+$submit.addEventListener('click', e => sendToAddress())
+
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $address.value = '1K9zQ8f4iTyhKyHWmiDKt21cYX2QSDckWB'
+    $amount.value = 0.0001
+
+})
+</script>
+
+</html>
