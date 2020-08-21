@@ -72,8 +72,8 @@ $example1.addEventListener('click', _ => {
     getBlockHash()
 })
 
-$example2.addEventListener('click', _ => {
-    $blockHash.value = 600001
+$example2.addEventListener('click', async _ => {
+    $blockHash.value = await bitcoinRPC('getblockcount')
     getBlockHash()
 })
 

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Block Stats</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Block Stats</h1>
+        <x-subtitle>Compute per block statistics for a given window. All amounts are in satoshis.
+It won't work for some heights with pruning.</x-subtitle>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
+        <div class="item" label="Block hash or height">
+            <input id="$blockId" placeholder="Paste a block hash">
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Block Stats</h2>
+        <div id="$blockhash" class="item" label="Block hash"></div>
+        <div id="$time" class="item" label="Time"></div>
+        <div id="$mediantime" class="item" label="Median time"></div>
+        <div class="row">
+            <div id="$height" class="item" label="Block height"></div>
+            <div id="$subsidy" class="item" label="Block subsidy"></div>
+            <div id="$totalfee" class="item" label="Total fee"></div>
+            <div id="$total_out" class="item" label="Total out"></div>
+        </div>
+        <div class="row">
+            <div id="$total_size" class="item" label="Total size"></div>
+            <div id="$total_weight" class="item" label="Total weight"></div>
+            <div id="$swtotal_size" class="item" label="SW total size"></div>
+            <div id="$swtotal_weight" class="item" label="SW total weight"></div>
+            <div id="$swtxs" class="item" label="SW TX count"></div>
+        </div>
+        <h3>Transactions</h3>
+        <div class="row">
+            <div id="$txs" class="item" label="TX count"></div>
+            <div id="$avgfee" class="item" label="Average Fee"></div>
+            <div id="$medianfee" class="item" label="Median Fee Rate"></div>
+            <div id="$avgfeerate" class="item" label="Avg. Fee Rate"></div>
+        </div>
+        <div class="row">
+            <div id="$maxfee" class="item" label="Max Fee"></div>
+            <div id="$maxfeerate" class="item" label="Max Fee Rate"></div>
+        </div>
+        <div class="row">
+            <div id="$maxtxsize" class="item" label="Max TX Size"></div>
+            <div id="$mintxsize" class="item" label="Min TX Size"></div>
+            <div id="$avgtxsize" class="item" label="Avg. TX Size"></div>
+            <div id="$mediantxsize" class="item" label="Median TX Size"></div>
+        </div>
+        <div class="row">
+            <div id="$ins" class="item" label="UTXOs spent"></div>
+            <div id="$outs" class="item" label="UTXOs created"></div>
+            <div id="$utxo_increase" class="item" label="UTXO increase"></div>
+            <div id="$utxo_size_inc" class="item" label="UTXO size increase"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+async function getBlock() {
+    resetUI()
+    const blockId = $blockId.value.length < 8 ? Number($blockId.value) : $blockId.value
+
+    if (blockId == '')
+        return
+
+    let block
+    try {
+        block = await bitcoinRPC('getblockstats', [blockId])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(block)
+
+
+    $blockhash.textContent = block.blockhash
+    $height.textContent = block.height
+    $subsidy.textContent = satoshisToBitcoin(block.subsidy)
+    $txs.textContent = block.txs
+    $total_out.textContent = satoshisToBitcoin(block.total_out)
+    $total_weight.textContent = block.total_weight
+    $total_size.textContent = formatBytesCount(block.total_size)
+
+    $maxfee.textContent = block.maxfee + ' sats/TX'
+    $maxfeerate.textContent = block.maxfeerate + ' sats/byte'
+    $medianfee.textContent = block.medianfee + ' sats/TX'
+    $totalfee.textContent = satoshisToBitcoin(block.totalfee)
+
+    $mintxsize.textContent = block.mintxsize + ' bytes'
+    $avgtxsize.textContent = block.avgtxsize + ' bytes'
+    $maxtxsize.textContent = block.maxtxsize + ' bytes'
+    $mediantxsize.textContent = block.mediantxsize + ' bytes'
+
+
+    $avgfee.textContent = block.avgfee + ' sats/TX'
+    $avgfeerate.textContent = block.avgfeerate + ' sats/byte'
+
+    $ins.textContent = block.ins + ' UTXOs'
+    $outs.textContent = block.outs + ' UTXOs'
+    $utxo_increase.textContent = block.utxo_increase + ' UTXOs'
+    $utxo_size_inc.textContent = formatBytesCount(block.utxo_size_inc)
+
+
+    $time.textContent = new Date(block.time * 1000)
+    $mediantime.textContent = new Date(block.mediantime * 1000)
+
+    $swtotal_size.textContent = formatBytesCount(block.swtotal_size)
+    $swtotal_weight.textContent = block.swtotal_weight
+    $swtxs.textContent = block.swtxs + ' TXs'
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $blockhash.textContent = ''
+    $height.textContent = ''
+    $subsidy.textContent = ''
+    $txs.textContent = ''
+    $total_out.textContent = ''
+    $avgfee.textContent = ''
+    $avgfeerate.textContent = ''
+    $avgtxsize.textContent = ''
+    $time.textContent = ''
+    $mediantime.textContent = ''
+    $total_weight.textContent = ''
+    $total_size.textContent = ''
+    $medianfee.textContent = ''
+
+    $mintxsize.textContent = ''
+    $avgtxsize.textContent = ''
+    $maxtxsize.textContent = ''
+    $mediantxsize.textContent = ''
+
+    $avgfee.textContent = ''
+    $avgfeerate.textContent = ''
+}
+
+$blockId.addEventListener('input', e => getBlock())
+
+function formatBytesCount(bytesCount) {
+    return Math.round(bytesCount / 1e6 * 100) / 100 + ' MB'
+}
+
+function satoshisToBitcoin(satoshis) {
+    return Math.round(satoshis / 1e8 * 100) / 100 + ' BTC'
+}
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $blockId.value = '000000000000000000020ff2893a89579d3e3db4ae4abbea3b021a11d73a92b3'
+    getBlock()
+})
+
+$example2.addEventListener('click', async _ => {
+    $blockId.value = await bitcoinRPC('getblockcount')
+    getBlock()
+})
+</script>
+
+</html>

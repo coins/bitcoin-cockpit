@@ -41,12 +41,12 @@
                 <input id="$comment_to" placeholder="Enter a name for the recipient address">
             </div>
             <div class="row">
-                <div class="item" title="Allow this transaction to be replaced by a transaction with higher fees via BIP 125">
+                <div class="item" title="Allow this transaction to be replaced by a transaction with higher fees via BIP 125" label="RBF">
                     <label>
                         <input id="$replaceable" type="checkbox">Replaceable
                     </label>
                 </div>
-                <div class="item" title="The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field.">
+                <div class="item" label="Fees" title="The fee will be deducted from the amount being sent. The recipient will receive less bitcoins than you enter in the amount field.">
                     <label>
                         <input id="$subtractfeefromamount" type="checkbox">Subtract fee from amount
                     </label>
@@ -79,13 +79,13 @@ async function sendToAddress() {
     let txid
     try {
         txid = await bitcoinRPC('sendtoaddress', [
-                        address, 
-                        amount, 
-                        comment, 
-                        comment_to, 
-                        subtractfeefromamount,
-                        replaceable
-                        ])
+            address,
+            amount,
+            comment,
+            comment_to,
+            subtractfeefromamount,
+            replaceable
+        ])
     } catch (e) {
         $error.textContent = e
         return
@@ -111,7 +111,8 @@ $submit.addEventListener('click', e => sendToAddress())
 $example1.addEventListener('click', _ => {
     $address.value = '1K9zQ8f4iTyhKyHWmiDKt21cYX2QSDckWB'
     $amount.value = 0.0001
-
+    $comment.value = 'Test transaction description'
+    $comment_to.value = 'Test recipient name'
 })
 </script>
 
