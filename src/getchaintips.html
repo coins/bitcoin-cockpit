@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Chain Tips</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Chain Tips</h1>
+        <x-subtitle>Return information about all known tips in the block tree, including the main chain as well as orphaned branches.</x-subtitle>
+        <div id="$chaintips"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+function setInfo(info) {
+    console.log(info)
+    info.forEach((chaintip, index) => {
+        const $chaintip = document.createElement('div')
+        $chaintips.append($chaintip)
+
+        const $heading = document.createElement('h3')
+        $heading.textContent = 'Chaintip ' + (index + 1)
+        $chaintip.append($heading)
+
+
+        const $hash = document.createElement('div')
+        $hash.className = 'item'
+        $hash.setAttribute('label', 'Hash')
+        $hash.textContent = chaintip.hash
+        $chaintip.append($hash)
+
+        const $row = document.createElement('div')
+        $row.className = 'row'
+        $chaintip.append($row)
+
+        const $height = document.createElement('div')
+        $height.className = 'item'
+        $height.setAttribute('label', 'Height')
+        $height.textContent = chaintip.height
+        $row.append($height)
+
+        const $branchlen = document.createElement('div')
+        $branchlen.className = 'item'
+        $branchlen.setAttribute('label', 'Branch length')
+        $branchlen.textContent = chaintip.branchlen
+        $row.append($branchlen)
+
+        const $status = document.createElement('div')
+        $status.className = 'item'
+        $status.setAttribute('label', 'Status')
+        $status.textContent = chaintip.status
+        $row.append($status)
+    })
+}
+
+bitcoinRPC('getchaintips').then(setInfo)
+</script>
+
+</html>
