@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Chain TX Stats</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Chain TX Stats</h1>
+        <x-subtitle>Compute statistics about the total number and rate of transactions in the chain.</x-subtitle>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
+        <div class="item" label="Number of blocks" title="Size of the window in number of blocks">
+            <input id="$nblocks" placeholder="Enter a number of blocks" type="number">
+        </div>
+        <div class="item" label="Block hash" title="The hash of the block that ends the window.">
+            <input id="$blockId" placeholder="Paste a block hash">
+        </div>
+        <div class="row-reverse">
+            <button id="$submit">Compute</button>
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Chain Stats</h2>
+        <div id="$blockhash" class="item" label="Block hash"></div>
+        <div id="$time" class="item" label="Time"></div>
+        <div class="row">
+            <div id="$txcount" class="item" label="TX Count"></div>
+            <div id="$txrate" class="item" label="TX rate"></div>
+            <div id="$totalfee" class="item" label="Total fee"></div>
+            <div id="$total_out" class="item" label="Total out"></div>
+        </div>
+        <div id="$window_final_block_hash" class="item" label="Window final block hash"></div>
+        <div class="row">
+            <div id="$window_block_count" class="item" label="Window Block Count"></div>
+            <div id="$window_final_block_height" class="item" label="Window final block height"></div>
+            <div id="$window_interval" class="item" label="Window interval"></div>
+            <div id="$window_tx_count" class="item" label="Window TX count"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+async function getChainTxStats() {
+    resetUI()
+    const nblocks = Number($nblocks.value)
+    const blockId = $blockId.value
+
+    
+    let stats
+    try {
+        if(nblocks)
+            stats = await bitcoinRPC('getchaintxstats', [nblocks, blockId])
+        else 
+            stats = await bitcoinRPC('getchaintxstats')
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(stats)
+
+    $time.textContent = new Date(stats.time * 1000)
+    $txcount.textContent = stats.txcount
+    $txrate.textContent = Math.round(stats.txrate * 10) / 10 + ' TX/s'
+
+    $window_tx_count.textContent = stats.window_tx_count
+    $window_interval.textContent = stats.window_interval
+    $window_final_block_height.textContent = stats.window_final_block_height
+    $window_final_block_hash.textContent = stats.window_final_block_hash
+    $window_block_count.textContent = stats.window_block_count
+
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $blockhash.textContent = ''
+
+}
+
+$submit.addEventListener('click', e => getChainTxStats())
+
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $blockId.value = '000000000000000000020ff2893a89579d3e3db4ae4abbea3b021a11d73a92b3'
+    $nblocks.value = 144 * 7 * 2 // 2 weeks
+    getChainTxStats()
+})
+
+$example2.addEventListener('click', async _ => {
+    $blockId.value = await bitcoinRPC('getbestblockhash')
+    $nblocks.value = 144 * 5 // 5 days
+    getChainTxStats()
+})
+</script>
+
+</html>
