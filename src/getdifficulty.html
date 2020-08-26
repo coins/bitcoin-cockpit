@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Difficulty</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Difficulty</h1>
+        <x-subtitle>Returns the proof-of-work difficulty as a multiple of the minimum difficulty.</x-subtitle>
+
+        <div class="error" id="$error"></div>
+        <h2>Difficulty</h2>
+        <div class="item" label="Difficulty" id="$difficulty"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+async function getChainTxStats() {
+
+
+    let difficulty
+    try {
+        difficulty = await bitcoinRPC('getdifficulty')
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(difficulty)
+
+    $difficulty.textContent = difficulty
+
+}
+
+getChainTxStats()
+
+
+</script>
+
+</html>
