@@ -24,12 +24,15 @@
             <a id="$example2">Example 2</a>
             <a id="$example1">Example 1</a>
         </div>
-        <div class="item" label="Number of blocks" title="Size of the window in number of blocks">
-            <input id="$nblocks" placeholder="Enter a number of blocks" type="number">
-        </div>
-        <div class="item" label="Block hash" title="The hash of the block that ends the window.">
-            <input id="$blockId" placeholder="Paste a block hash">
-        </div>
+        <details>
+            <summary>Options</summary>
+            <div class="item" label="Number of blocks" title="Size of the window in number of blocks">
+                <input id="$nblocks" placeholder="Enter a number of blocks" type="number">
+            </div>
+            <div class="item" label="Block hash" title="The hash of the block that ends the window.">
+                <input id="$blockId" placeholder="Paste a block hash">
+            </div>
+        </details>
         <div class="row-reverse">
             <button id="$submit">Compute</button>
         </div>
@@ -59,12 +62,12 @@ async function getChainTxStats() {
     const nblocks = Number($nblocks.value)
     const blockId = $blockId.value
 
-    
+
     let stats
     try {
-        if(nblocks)
+        if (nblocks)
             stats = await bitcoinRPC('getchaintxstats', [nblocks, blockId])
-        else 
+        else
             stats = await bitcoinRPC('getchaintxstats')
     } catch (e) {
         $error.textContent = e
