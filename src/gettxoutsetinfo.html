@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get TXout set info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get TXout set info</h1>
+        <x-subtitle>Returns statistics about the unspent transaction output set.<br>
+        Note this call may take some time.</x-subtitle>
+        
+        <div class="error" id="$error"></div>
+        
+        <h2>Output Set Info</h2>
+
+        <div id="$bestblock" class="item" label="Block hash" title="The hash of the block at the tip of the chain"></div>
+        <div id="$hash_serialized_2" class="item" label="Block hash" title="The hash of the block at the tip of the chain"></div>
+        <div class="row">
+            <div id="$height" class="item" label="Block height" title="The current block height"></div>
+            <div id="$transactions" class="item" label="Transactions count" title="The number of transactions with unspent outputs"></div>
+            <div id="$txouts" class="item" label="UTXO count" title="The number of unspent transaction outputs"></div>
+            <div id="$disk_size" class="item" label="Disk Size" title="The estimated size of the chainstate on disk"></div>
+            <div id="$total_amount" class="item" label="Amount" title="The total amount"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+async function getTXoutSetInfo() {
+
+    let info
+    try {
+        info = await bitcoinRPC('gettxoutsetinfo')
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(info)
+
+    $height.textContent = info.height
+    $bestblock.textContent = info.bestblock
+    $hash_serialized_2.textContent = info.hash_serialized_2
+    $transactions.textContent = info.transactions
+    $txouts.textContent = info.txouts
+    $disk_size.textContent = formatBytesCount( info.disk_size)
+    $total_amount.textContent = info.total_amount + ' BTC'
+}
+
+getTXoutSetInfo()
+
+function formatBytesCount(bytesCount) {
+    return Math.round(bytesCount / 1e9 * 100) / 100 + ' GB'
+}
+
+</script>
+
+</html>
