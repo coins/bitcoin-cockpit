@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Addresses by Label</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Addresses by Label</h1>
+        <x-subtitle>Returns the list of addresses assigned the specified label.</x-subtitle>
+        <div class="item" label="Label">
+            <select id="$label"></select>
+        </div>
+        <div id="$error" class="error"></div>
+        <div id="$addresses" class="column"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+
+async function getLabels() {
+    let labels
+    try {
+        labels = await bitcoinRPC('listlabels', [])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    labels.forEach((label) => {
+        const $item = document.createElement('option')
+        $item.textContent = label ? label : '(unnamed)'
+        $item.value = label
+        $label.append($item)
+    })
+}
+
+
+
+async function getAddresses() {
+    resetUI()
+    const label = $label.value
+
+
+    let addresses
+    try {
+        addresses = await bitcoinRPC('getaddressesbylabel', [label])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(addresses)
+    Object.keys(addresses).forEach((address) => {
+        const $item = document.createElement('div')
+        $item.className = 'item'
+        $item.textContent = address
+        $item.setAttribute('label', addresses[address].purpose)
+        $addresses.append($item)
+    })
+
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $addresses.innerHTML = ''
+}
+
+$label.addEventListener('change', e => getAddresses())
+
+getLabels()
+</script>
+
+</html>
