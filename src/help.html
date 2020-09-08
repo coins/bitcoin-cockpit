@@ -6,12 +6,6 @@
     <title>Help</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
-    <style>
-    .item {
-        overflow-x: scroll;
-        padding: 40px 0;
-    }
-    </style>
 </head>
 
 <body>
@@ -24,6 +18,7 @@
         <select id="$command"></select>
         <div class="error" id="$error"></div>
         <h2 id="$heading">Help</h2>
+        <a id="$link"></a>
         <pre class="item" id="$help"></pre>
     </main>
 </body>
@@ -46,14 +41,24 @@ async function listCommands() {
     $help.textContent = help
 
     const $item = document.createElement('option')
+    $item.value = ''
+    $item.textContent = 'Select Command'
     $command.append($item)
 
-    $item.value = ''
+    $link.textContent = ''
+
     help
         .split('\n')
         .filter(command => command && !command.startsWith('=='))
         .map(command => command.split(' ')[0])
         .forEach(command => {
+
+            // if (!command.startsWith('==')) {
+            //     const $item = document.createElement('optgroup')
+            //     $item.label
+            //     return
+            // } 
+
             const $item = document.createElement('option')
             $item.textContent = command
             $item.value = command
@@ -76,6 +81,9 @@ async function help() {
     }
 
     console.log(help)
+
+    $link.href = command + '.html'
+    $link.textContent = command
 
     $help.textContent = help
     $heading.textContent = 'Help ' + command

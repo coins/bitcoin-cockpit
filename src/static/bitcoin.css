@@ -118,8 +118,13 @@ summary {
     font-size: 13px;
 }
 
-label{
+label {
     font-size: 15px;
+}
+
+pre {
+    overflow-x: scroll;
+    padding: 40px 0;
 }
 
 
