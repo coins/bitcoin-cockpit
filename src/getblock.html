@@ -15,7 +15,7 @@
 
 <body>
     <header>
-<img src="static/bitcoin_logo.svg" width="120">
+        <img src="static/bitcoin_logo.svg" width="120">
     </header>
     <main>
         <h1>Get Block</h1>
@@ -49,7 +49,6 @@
         <div class="row">
             <div id="$version" class="item" label="Version"></div>
             <div id="$versionHex" class="item" label="Version Hex"></div>
-            
         </div>
         <h3>Transactions</h3>
         <div class="row">
@@ -66,8 +65,8 @@ async function getBlock() {
     const blockId = $blockId.value
     const verbosity = Number($verbosity.value)
 
-    if(blockId == '')
-        return 
+    if (blockId == '')
+        return
 
     let block
     try {
@@ -108,7 +107,7 @@ async function getBlock() {
         })
     }
 
-    if(verbosity == 2){
+    if (verbosity == 2) {
         block.tx.forEach((t, index) => {
             const $item = document.createElement('div')
             $item.className = 'item'

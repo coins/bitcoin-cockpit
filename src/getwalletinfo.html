@@ -15,7 +15,7 @@
 
 <body>
     <header>
-<img src="static/bitcoin_logo.svg" width="120">
+        <img src="static/bitcoin_logo.svg" width="120">
     </header>
     <main>
         <h1>Get Wallet Info</h1>
@@ -41,8 +41,8 @@
             <div id="$scanning" class="item" label="Scanning"></div>
             <div id="$paytxfee" class="item" label="Pay TX fee"></div>
         </div>
+        <div id="$keypoololdest" class="item" label="keypoololdest"></div>
         <div class="row">
-            <div id="$keypoololdest" class="item" label="keypoololdest"></div>
             <div id="$keypoolsize" class="item" label="keypoolsize"></div>
             <div id="$keypoolsize_hd_internal" class="item" label="keypoolsize_hd_internal"></div>
         </div>
@@ -50,9 +50,9 @@
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
-<script type="text/javascript">
+<script>
 async function getWalletInfo() {
-    
+
     let info
     try {
         info = await bitcoinRPC('getwalletinfo')
@@ -71,14 +71,14 @@ async function getWalletInfo() {
     $avoid_reuse.textContent = info.avoid_reuse ? 'YES' : 'NO'
     $descriptors.textContent = info.descriptors ? 'YES' : 'NO'
     $private_keys_enabled.textContent = info.private_keys_enabled ? 'YES' : 'NO'
-    $walletversion.textContent = info.walletversion 
-    
-    $scanning.textContent = info.scanning 
+    $walletversion.textContent = info.walletversion
+
+    $scanning.textContent = info.scanning
     $paytxfee.textContent = info.paytxfee
 
-    $keypoololdest.textContent = info.keypoololdest 
-    $keypoolsize.textContent = info.keypoolsize 
-    $keypoolsize_hd_internal.textContent = info.keypoolsize_hd_internal 
+    $keypoololdest.textContent = new Date(info.keypoololdest * 1000)
+    $keypoolsize.textContent = info.keypoolsize
+    $keypoolsize_hd_internal.textContent = info.keypoolsize_hd_internal
 }
 
 

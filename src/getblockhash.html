@@ -15,7 +15,7 @@
 
 <body>
     <header>
-<img src="static/bitcoin_logo.svg" width="120">
+        <img src="static/bitcoin_logo.svg" width="120">
     </header>
     <main>
         <h1>Get Block Hash</h1>
@@ -48,7 +48,7 @@ async function getBlockHash() {
     }
 
     console.log(block)
-        $hash.textContent = block
+    $hash.textContent = block
 }
 
 function resetUI() {
@@ -76,7 +76,6 @@ $example2.addEventListener('click', async _ => {
     $blockHash.value = await bitcoinRPC('getblockcount')
     getBlockHash()
 })
-
 </script>
 
 </html>
