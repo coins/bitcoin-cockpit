@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Help</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style>
+    .item {
+        overflow-x: scroll;
+        padding: 40px 0;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Help</h1>
+        <x-subtitle>List all commands, or get help for a specified command.</x-subtitle>
+        <select id="$command"></select>
+        <div class="error" id="$error"></div>
+        <h2 id="$heading">Help</h2>
+        <pre class="item" id="$help"></pre>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function listCommands() {
+
+    $heading.textContent = 'Help'
+
+    let help
+    try {
+        help = await bitcoinRPC('help')
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(help)
+
+    $help.textContent = help
+
+    const $item = document.createElement('option')
+    $command.append($item)
+
+    $item.value = ''
+    help
+        .split('\n')
+        .filter(command => command && !command.startsWith('=='))
+        .map(command => command.split(' ')[0])
+        .forEach(command => {
+            const $item = document.createElement('option')
+            $item.textContent = command
+            $item.value = command
+            $command.append($item)
+        })
+}
+
+listCommands()
+
+async function help() {
+    const command = $command.value
+
+
+    let help
+    try {
+        help = await bitcoinRPC('help', [command])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(help)
+
+    $help.textContent = help
+    $heading.textContent = 'Help ' + command
+}
+
+
+$command.addEventListener('change', e => help())
+</script>
+
+</html>
