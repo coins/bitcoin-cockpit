@@ -10,6 +10,16 @@
     textarea {
         height: 120px;
     }
+
+    details>* {
+        margin-left: 24px;
+    }
+
+    h3 {
+        padding-top: 64px;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        margin-top: 64px;
+    }
     </style>
 </head>
 
@@ -35,7 +45,7 @@
             </select>
         </div>
         <div class="error" id="$error"></div>
-        <h2>Block</h2>
+        <h1>Block</h1>
         <div id="$hash" class="item" label="Block Hash:"></div>
         <div id="$previousblockhash" class="item" label="Previous Block Hash"></div>
         <div id="$time" class="item" label="Time"></div>
@@ -50,7 +60,7 @@
             <div id="$version" class="item" label="Version"></div>
             <div id="$versionHex" class="item" label="Version Hex"></div>
         </div>
-        <h3>Transactions</h3>
+        <h2>Transactions</h2>
         <div class="row">
             <div id="$nTx" class="item" label="TX count"></div>
         </div>
@@ -109,11 +119,156 @@ async function getBlock() {
 
     if (verbosity == 2) {
         block.tx.forEach((t, index) => {
+            const $heading = document.createElement('h3')
+            $heading.textContent = 'Transaction ' + index
+            $transactions.append($heading)
+
             const $item = document.createElement('div')
             $item.className = 'item'
-            $item.setAttribute('label', 'Transaction Id' + index)
+            $item.setAttribute('label', 'Transaction Id')
             $item.textContent = t.txid
             $transactions.append($item)
+
+
+            const $row = document.createElement('div')
+            $row.className = 'row'
+            $transactions.append($row)
+
+
+            const $version = document.createElement('div')
+            $version.className = 'item'
+            $version.setAttribute('label', 'Version')
+            $version.textContent = t.version
+            $row.append($version)
+
+            const $locktime = document.createElement('div')
+            $locktime.className = 'item'
+            $locktime.setAttribute('label', 'Locktime')
+            $locktime.textContent = t.locktime
+            $row.append($locktime)
+
+            const $size = document.createElement('div')
+            $size.className = 'item'
+            $size.setAttribute('label', 'Size')
+            $size.textContent = t.size
+            $row.append($size)
+
+    
+            const $weight = document.createElement('div')
+            $weight.className = 'item'
+            $weight.setAttribute('label', 'Weight')
+            $weight.textContent = t.weight
+            $row.append($weight)
+
+            const $vSize = document.createElement('div')
+            $vSize.className = 'item'
+            $vSize.setAttribute('label', 'vSize')
+            $vSize.textContent = t.vSize
+            $row.append($vSize)
+
+
+            const $vinDetails = document.createElement('details')
+            $vinDetails.innerHTML = '<summary>Inputs</summary>'
+            $transactions.append($vinDetails)
+
+            t.vin.forEach(vin => {
+                const $row = document.createElement('div')
+                $row.className = 'row'
+                $vinDetails.append($row)
+
+
+                const $txid = document.createElement('div')
+                $txid.className = 'item'
+                $txid.setAttribute('label', 'TXID')
+                $txid.textContent = vin.txid
+                $row.append($txid)
+
+                const $vout = document.createElement('div')
+                $vout.className = 'item'
+                $vout.setAttribute('label', 'vout')
+                $vout.textContent = vin.vout
+                $row.append($vout)
+
+                if (vin.scriptSig) {
+
+                    const $scriptSigAsm = document.createElement('div')
+                    $scriptSigAsm.className = 'item'
+                    $scriptSigAsm.setAttribute('label', 'scriptSig (asm)')
+                    $scriptSigAsm.textContent = vin.scriptSig.asm
+                    $vinDetails.append($scriptSigAsm)
+
+                    const $scriptSigHex = document.createElement('div')
+                    $scriptSigHex.className = 'item'
+                    $scriptSigHex.setAttribute('label', 'scriptSig (hex)')
+                    $scriptSigHex.textContent = vin.scriptSig.hex
+                    $vinDetails.append($scriptSigHex)
+                }
+
+
+                if (vin.txinwitness) {
+
+                    const $witnesses = document.createElement('details')
+                    $witnesses.innerHTML = '<summary>TXIN Witnesses</summary>'
+                    $vinDetails.append($witnesses)
+
+                    vin.txinwitness.forEach((txinwitness, index) => {
+                        const $witness = document.createElement('div')
+                        $witness.className = 'item'
+                        $witness.setAttribute('label', 'Witness ' + index)
+                        $witness.textContent = txinwitness
+                        $witnesses.append($witness)
+
+                    })
+                }
+
+
+
+            })
+
+
+            const $voutDetails = document.createElement('details')
+            $voutDetails.innerHTML = '<summary>Outputs</summary>'
+            $transactions.append($voutDetails)
+
+
+            t.vout.forEach(vout => {
+
+                const $scriptPubKeyAsm = document.createElement('div')
+                $scriptPubKeyAsm.className = 'item'
+                $scriptPubKeyAsm.setAttribute('label', 'scriptPubKey (asm)')
+                $scriptPubKeyAsm.textContent = vout.scriptPubKey.asm
+                $voutDetails.append($scriptPubKeyAsm)
+
+                const $scriptPubKeyHex = document.createElement('div')
+                $scriptPubKeyHex.className = 'item'
+                $scriptPubKeyHex.setAttribute('label', 'scriptPubKey (hex)')
+                $scriptPubKeyHex.textContent = vout.scriptPubKey.hex
+                $voutDetails.append($scriptPubKeyHex)
+
+                const $row = document.createElement('div')
+                $row.className = 'row'
+                $voutDetails.append($row)
+
+                const $n = document.createElement('div')
+                $n.className = 'item'
+                $n.setAttribute('label', 'n')
+                $n.textContent = vout.n
+                $row.append($n)
+
+                const $reqSigs = document.createElement('div')
+                $reqSigs.className = 'item'
+                $reqSigs.setAttribute('label', 'reqSigs')
+                $reqSigs.textContent = vout.reqSigs
+                $row.append($reqSigs)
+
+                const $value = document.createElement('div')
+                $value.className = 'item'
+                $value.setAttribute('label', 'value')
+                $value.textContent = vout.value + ' BTC'
+                $row.append($value)
+
+            })
+
         })
     }
 }
