@@ -20,12 +20,8 @@
     <main>
         <h1>Dump Private Key</h1>
         <x-subtitle>Reveals the private key corresponding to 'address'.<br>
-        Then the importprivkey can be used with this output.</x-subtitle>
-        <div class="item" label="Wallet">
-            <select id="$wallet" placeholder="">
-                <option value="null" selected>Select a wallet</option>
-            </select>
-        </div>
+            Then the importprivkey can be used with this output.</x-subtitle>
+        <wallet-selector id="$wallet"></wallet-selector>
         <div class="item" label="Address">
             <input id="$address">
         </div>
@@ -37,27 +33,8 @@
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
 <script>
-async function getWallets() {
-    let wallets
-    try {
-        wallets = await bitcoinRPC('listwallets', [])
-    } catch (e) {
-        $error.textContent = e
-        return
-    }
-    console.log(wallets)
-
-    wallets.forEach((walletname) => {
-        const $item = document.createElement('option')
-        $item.textContent = walletname ? walletname : '(unnamed wallet)'
-        $item.value = walletname
-        $wallet.append($item)
-    })
-}
-getWallets()
-
-
 async function dumpPrivKey() {
     resetUI()
     const wallet = 'wallet/' + $wallet.value
@@ -73,7 +50,7 @@ async function dumpPrivKey() {
 
     console.log(privKey)
     $privKey.textContent = privKey
-    
+
 }
 
 function resetUI() {
@@ -83,8 +60,6 @@ function resetUI() {
 
 $wallet.addEventListener('change', e => resetUI())
 $submit.addEventListener('click', e => dumpPrivKey())
-
-
 </script>
 
 </html>

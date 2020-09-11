@@ -39,12 +39,10 @@
         <div class="error" id="$error"></div>
         <h2>Chain Stats</h2>
         <div id="$blockhash" class="item" label="Block hash"></div>
-        <div id="$time" class="item" label="Time"></div>
         <div class="row">
+            <div id="$time" class="item" label="Time"></div>
             <div id="$txcount" class="item" label="TX Count"></div>
             <div id="$txrate" class="item" label="TX rate"></div>
-            <div id="$totalfee" class="item" label="Total fee"></div>
-            <div id="$total_out" class="item" label="Total out"></div>
         </div>
         <div id="$window_final_block_hash" class="item" label="Window final block hash"></div>
         <div class="row">
@@ -76,7 +74,7 @@ async function getChainTxStats() {
 
     console.log(stats)
 
-    $time.textContent = new Date(stats.time * 1000)
+    $time.textContent = new Date(stats.time * 1000).toLocaleString()
     $txcount.textContent = stats.txcount
     $txrate.textContent = Math.round(stats.txrate * 10) / 10 + ' TX/s'
 

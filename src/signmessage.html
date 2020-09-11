@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
     <script src="static/bitcoin-rpc.js"></script>
+    
 </head>
 
 <body>
@@ -22,11 +23,7 @@
             <a id="$example2">Example 2</a>
             <a id="$example1">Example 1</a>
         </div>
-        <div class="item" label="Wallet">
-            <select id="$wallet" placeholder="">
-                <option value="null" selected>Select a wallet</option>
-            </select>
-        </div>
+        <wallet-selector id="$wallet"></wallet-selector>
         <div class="item" label="Address">
             <input id="$address" placeholder="Enter an address">
         </div>
@@ -41,28 +38,8 @@
         <div id="$signedMsg" class="item" label="Signed Message (base64 encoded)"></div>
     </main>
 </body>
+<script src="wallet-selector.js"></script>
 <script>
-async function getWallets() {
-    let wallets
-    try {
-        wallets = (await bitcoinRPC('listwalletdir', [])).wallets
-    } catch (e) {
-        $error.textContent = e
-        return
-    }
-    console.log(wallets)
-
-    wallets.forEach((wallet) => {
-        const walletname = wallet.name
-        const $item = document.createElement('option')
-        $item.textContent = walletname ? walletname : '(unnamed wallet)'
-        $item.value = walletname
-        $wallet.append($item)
-    })
-}
-getWallets()
-
-
 async function signMessage() {
 
     if ($wallet.value === 'null') return

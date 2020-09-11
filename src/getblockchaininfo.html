@@ -28,7 +28,10 @@
             <div id="$size_on_disk" class="item" label="Size on disk:"></div>
             <div id="$prune_target_size" class="item" label="Prune Target Size:"></div>
             <div id="$chain" class="item" label="Network:"></div>
+            <div id="$pruned" class="item" label="Pruned"></div>
+            <div id="$pruneheight" class="item" label="Prune Height"></div>
         </div>
+        <div id="$warnings" class="item" label="Warnings"></div>
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
@@ -38,13 +41,21 @@ function setInfo(info) {
     $bestblockhash.textContent = info.bestblockhash
     $blocks.textContent = info.blocks
     $headers.textContent = info.headers
-    $mediantime.textContent = new Date(info.mediantime * 1000)
+    
+    const mediantime = new Date(info.mediantime * 1000)
+    $mediantime.textContent = mediantime.toLocaleString()
+    $mediantime.title = mediantime
+
     $size_on_disk.textContent = formatBytesCount(info.size_on_disk)
     $prune_target_size.textContent = formatBytesCount(info.prune_target_size)
     $verificationprogress.textContent = formatPercent(info.verificationprogress)
     $difficulty.textContent = info.difficulty
     $chainwork.textContent = info.chainwork
     $chain.textContent = info.chain
+    $pruneheight.textContent = info.pruneheight
+    $pruned.textContent = info.pruned
+
+    $warnings.textContent = info.warnings
 }
 
 function formatBytesCount(bytesCount) {

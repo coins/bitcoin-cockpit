@@ -28,37 +28,14 @@
         <x-subtitle>If a label name is provided, this will return only incoming transactions paying to addresses with the specified label.<br />
             Returns up to 'count' most recent transactions skipping the first 'from' transactions.
         </x-subtitle>
-        <div class="item" label="Wallet">
-            <select id="$wallet" placeholder="">
-                <option value="null" selected>Select a wallet</option>
-            </select>
-        </div>
+        <wallet-selector id="$wallet"></wallet-selector>
         <div id="$error" class="error"></div>
         <div id="$transactions" class="column"></div>
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
 <script>
-async function getWallets() {
-    let wallets
-    try {
-        wallets = (await bitcoinRPC('listwalletdir', [])).wallets
-    } catch (e) {
-        $error.textContent = e
-        return
-    }
-    console.log(wallets)
-
-    wallets.forEach((wallet) => {
-        const walletname = wallet.name
-        const $item = document.createElement('option')
-        $item.textContent = walletname ? walletname : '(unnamed wallet)'
-        $item.value = walletname
-        $wallet.append($item)
-    })
-}
-getWallets()
-
 
 async function listTransactions() {
     resetUI()
@@ -192,7 +169,7 @@ async function listTransactions() {
         $bip125_replaceable.className = 'item'
         $bip125_replaceable.textContent = tx['bip125-replaceable']
         $bip125_replaceable.title = 'bip125 replaceable'
-        $bip125_replaceable.setAttribute('label', 'Replacable')
+        $bip125_replaceable.setAttribute('label', 'Replaceable')
         $row.append($bip125_replaceable)
 
 

@@ -20,7 +20,7 @@
     <main>
         <h1>Get Block Stats</h1>
         <x-subtitle>Compute per block statistics for a given window. All amounts are in satoshis.
-It won't work for some heights with pruning.</x-subtitle>
+            It won't work for some heights with pruning.</x-subtitle>
         <div class="row-reverse">
             <a id="$example2">Example 2</a>
             <a id="$example1">Example 1</a>
@@ -31,8 +31,10 @@ It won't work for some heights with pruning.</x-subtitle>
         <div class="error" id="$error"></div>
         <h2>Block Stats</h2>
         <div id="$blockhash" class="item" label="Block hash"></div>
-        <div id="$time" class="item" label="Time"></div>
-        <div id="$mediantime" class="item" label="Median time"></div>
+        <div class="row">
+            <div id="$time" class="item" label="Time"></div>
+            <div id="$mediantime" class="item" label="Median time"></div>
+        </div>
         <div class="row">
             <div id="$height" class="item" label="Block height"></div>
             <div id="$subsidy" class="item" label="Block subsidy"></div>
@@ -119,8 +121,13 @@ async function getBlock() {
     $utxo_size_inc.textContent = formatBytesCount(block.utxo_size_inc)
 
 
-    $time.textContent = new Date(block.time * 1000)
-    $mediantime.textContent = new Date(block.mediantime * 1000)
+    const time = new Date(block.time * 1000)
+    $time.textContent = time.toLocaleString()
+    $time.title = time
+
+    const mediantime = new Date(block.mediantime * 1000)
+    $mediantime.textContent = mediantime.toLocaleString()
+    $mediantime.title = mediantime
 
     $swtotal_size.textContent = formatBytesCount(block.swtotal_size)
     $swtotal_weight.textContent = block.swtotal_weight

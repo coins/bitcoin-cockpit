@@ -100,7 +100,7 @@ button {
     background: var(--primary-color);
     color: white;
     transition: transform 200ms;
-    border-radius: 100px;
+    border-radius: 8px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     text-rendering: optimizeLegibility;
@@ -143,7 +143,7 @@ pre {
     margin-bottom: 2px;
 }
 
-.item:empty {
+.item:empty, .item[hidden] {
     display: none;
 }
 
@@ -177,4 +177,8 @@ pre {
     margin: 16px 0;
     color: red;
     font-size: 20px;
+}
+
+wallet-selector > select {
+    width: 100%;
 }

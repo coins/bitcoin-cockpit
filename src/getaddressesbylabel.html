@@ -20,11 +20,7 @@
     <main>
         <h1>Get Addresses by Label</h1>
         <x-subtitle>Returns the list of addresses assigned the specified label.</x-subtitle>
-        <div class="item" label="Wallet">
-            <select id="$wallet" placeholder="">
-                <option value="null" selected>Select a wallet</option>
-            </select>
-        </div>
+        <wallet-selector id="$wallet"></wallet-selector>
         <div class="item" label="Label">
             <select id="$label"></select>
         </div>
@@ -33,25 +29,9 @@
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
 <script>
-async function getWallets() {
-    let wallets
-    try {
-        wallets = await bitcoinRPC('listwallets', [])
-    } catch (e) {
-        $error.textContent = e
-        return
-    }
-    console.log(wallets)
 
-    wallets.forEach((walletname) => {
-        const $item = document.createElement('option')
-        $item.textContent = walletname ? walletname : '(unnamed wallet)'
-        $item.value = walletname
-        $wallet.append($item)
-    })
-}
-getWallets()
 
 async function getLabels() {
     if ($wallet.value === 'null') return
@@ -67,6 +47,7 @@ async function getLabels() {
     }
 
     if (labels.length) {
+        $label.innerHTML = '<option value="null" selected disabled>Select a label</option>'
         labels.forEach((label) => {
             const $item = document.createElement('option')
             $item.textContent = label ? label : '(unnamed label)'
@@ -75,6 +56,7 @@ async function getLabels() {
         })
         $label.disabled = false
     } else {
+        $label.innerHTML = ''
         $label.disabled = true
         const $item = document.createElement('option')
         $item.textContent = 'No labels yet'

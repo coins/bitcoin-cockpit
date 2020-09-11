@@ -21,19 +21,51 @@
         <h1>Create Wallet</h1>
         <x-subtitle>Creates and loads a new wallet.</x-subtitle>
         <div class="row-reverse">
-            <a id="$example1">Example 1</a>
+            <a id="$example1">Example</a>
         </div>
         <div class="item" label="Wallet name">
             <input id="$walletName" placeholder="Enter a wallet name" title="The name for the new wallet. If this is a path, the wallet will be created at the path location.">
         </div>
         <details>
             <summary>Options</summary>
+            <div class="row">
+                <div class="item" title="Disable the possibility of private keys (only watchonlys are possible in this mode).">
+                    <label>
+                        <input type="checkbox" id="$disable_private_keys">Disable Private Key
+                    </label>
+                </div>
+                <div class="item" title="Create a blank wallet. A blank wallet has no keys or HD seed. One can be set using sethdseed.">
+                    <label>
+                        <input type="checkbox" id="$blank">Blank
+                    </label>
+                </div>
+                <div class="item" title="Keep track of coin reuse, and treat dirty and clean coins differently with privacy considerations in mind.">
+                    <label>
+                        <input type="checkbox" id="$avoid_reuse">Avoid Reuse
+                    </label>
+                </div>
+                <div class="item" title="Save wallet name to persistent settings and load on startup. True to add wallet to startup list, false to remove, null to leave unchanged.">
+                    <label>
+                        <input type="checkbox" id="$load_on_startup" checked>Load on Startup
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="item" title="Create a native descriptor wallet. The wallet will use descriptors internally to handle address creation.">
+                    <label>
+                        <input type="checkbox" id="$descriptor">Use Descriptors
+                    </label>
+                </div>
+            </div>
+            <div class="item" label="Passphrase" title="Encrypt the wallet with this passphrase.">
+                <input id="$passphrase" placeholder="Enter a passphrase">
+            </div>
         </details>
         <div class="row-reverse">
             <button id="$submit">Create Wallet</button>
         </div>
         <div class="error" id="$error"></div>
-        <h2>Wallet Name</h2>
+        <h2>Result</h2>
         <div id="$name" class="item" label="Wallet Name"></div>
         <div id="$warning" class="item" label="Warning"></div>
     </main>
@@ -43,11 +75,25 @@
 async function createWallet() {
     resetUI()
     const walletName = $walletName.value
+    const disable_private_keys = $disable_private_keys.checked
+    const blank = $blank.value === 'true'
+    const passphrase = $passphrase.value === '' ? undefined : $passphrase.value
+    const avoid_reuse = $avoid_reuse.checked
+    const descriptor = $descriptor.checked
+    const load_on_startup = $load_on_startup.checked
 
 
     let walletResult
     try {
-        walletResult = await bitcoinRPC('createwallet', [walletName])
+        walletResult = await bitcoinRPC('createwallet', [
+            walletName,
+            disable_private_keys,
+            blank,
+            passphrase,
+            avoid_reuse,
+            descriptor,
+            load_on_startup
+        ])
     } catch (e) {
         $error.textContent = e
         return
@@ -73,9 +119,8 @@ $submit.addEventListener('click', e => createWallet())
  * 
  */
 $example1.addEventListener('click', _ => {
-    $walletName.value = 'test_wallet_at_'+ Date.now()
+    $walletName.value = 'test_wallet_at_' + Date.now()
 })
-
 </script>
 
 </html>

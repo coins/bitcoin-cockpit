@@ -48,8 +48,10 @@
         <h1>Block</h1>
         <div id="$hash" class="item" label="Block Hash:"></div>
         <div id="$previousblockhash" class="item" label="Previous Block Hash"></div>
-        <div id="$time" class="item" label="Time"></div>
-        <div id="$mediantime" class="item" label="Median Time"></div>
+        <div class="row">
+            <div id="$time" class="item" label="Time"></div>
+            <div id="$mediantime" class="item" label="Median Time"></div>
+        </div>
         <div class="row">
             <div id="$height" class="item" label="Block Height"></div>
             <div id="$confirmations" class="item" label="Confirmations"></div>
@@ -153,7 +155,7 @@ async function getBlock() {
             $size.textContent = t.size
             $row.append($size)
 
-    
+
             const $weight = document.createElement('div')
             $weight.className = 'item'
             $weight.setAttribute('label', 'Weight')

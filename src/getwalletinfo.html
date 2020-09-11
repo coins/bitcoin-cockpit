@@ -20,11 +20,7 @@
     <main>
         <h1>Get Wallet Info</h1>
         <x-subtitle>Various wallet state info.</x-subtitle>
-        <div class="item" label="Wallet">
-            <select id="$wallet" placeholder="">
-                <option value="" selected>Select a wallet</option>
-            </select>
-        </div>
+        <wallet-selector id="$wallet"></wallet-selector>
         <div class="error" id="$error"></div>
         <section id="$result" hidden="true">
             <h2>Wallet Info</h2>
@@ -57,23 +53,8 @@
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
 <script>
-async function getWallets() {
-    let wallets
-    try {
-        wallets = await bitcoinRPC('listwallets', [])
-    } catch (e) {
-        $error.textContent = e
-        return
-    }
-    console.log(wallets)
-    wallets.forEach((walletname) => {
-        const $item = document.createElement('option')
-        $item.textContent = walletname ? walletname : '(unnamed)'
-        $item.value = walletname
-        $wallet.append($item)
-    })
-}
 
 
 async function getWalletInfo() {
@@ -114,7 +95,6 @@ async function getWalletInfo() {
 }
 
 
-getWallets()
 
 $wallet.addEventListener('change', _ => getWalletInfo())
 </script>

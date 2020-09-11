@@ -20,9 +20,7 @@
     <main>
         <h1>Unload Wallet</h1>
         <x-subtitle>Unloads the referenced wallet.</x-subtitle>
-        <div class="item" label="Wallet">
-            <select id="$wallet"></select>
-        </div>
+        <wallet-selector id="$wallet"></wallet-selector>
         <div class="row-reverse">
             <button id="$submit">Unload</button>
         </div>
@@ -31,27 +29,8 @@
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
 <script>
-async function getWallets() {
-    let wallets
-    try {
-        wallets = await bitcoinRPC('listwallets', [])
-    } catch (e) {
-        $error.textContent = e
-        return
-    }
-    console.log(wallets)
-    $wallet.innerHTML = '<option value="null" selected>Select a wallet</option>'
-    wallets.forEach((walletname) => {
-        const $item = document.createElement('option')
-        $item.textContent = walletname ? walletname : '(unnamed wallet)'
-        $item.value = walletname
-        $wallet.append($item)
-    })
-}
-getWallets()
-
-
 async function unloadwallet() {
     resetUI()
     const wallet = $wallet.value
@@ -69,7 +48,7 @@ async function unloadwallet() {
 
     console.log(result)
     $warning.textContent = result.warning
-    getWallets()
+    $wallet.getWallets()
 }
 
 function resetUI() {
