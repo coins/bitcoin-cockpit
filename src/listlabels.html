@@ -19,6 +19,11 @@
             <a id="$example2">Example 2</a>
             <a id="$example1">Example 1</a>
         </div>
+        <div class="item" label="Wallet">
+            <select id="$wallet" placeholder="">
+                <option value="null" selected>Select a wallet</option>
+            </select>
+        </div>
         <div class="item" label="Purpose">
             <select id="$purpose">
                 <option value="">Any</option>
@@ -33,13 +38,33 @@
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script>
+async function getWallets() {
+    let wallets
+    try {
+        wallets = await bitcoinRPC('listwallets', [])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    console.log(wallets)
+    wallets.forEach((walletname) => {
+        const $item = document.createElement('option')
+        $item.textContent = walletname ? walletname : '(unnamed)'
+        $item.value = walletname
+        $wallet.append($item)
+    })
+}
+getWallets()
+
 async function getLabels() {
     resetUI()
     const purpose = $purpose.value
 
+    const wallet = 'wallet/' + $wallet.value
+
     let labels
     try {
-        labels = await bitcoinRPC('listlabels', [purpose])
+        labels = await bitcoinRPC('listlabels', [purpose], wallet)
     } catch (e) {
         $error.textContent = e
         return
@@ -69,8 +94,8 @@ function resetUI() {
 }
 
 $purpose.addEventListener('input', e => getLabels())
+$wallet.addEventListener('input', e => getLabels())
 
-getLabels()
 
 /**
  *

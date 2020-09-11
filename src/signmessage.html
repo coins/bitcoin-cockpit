@@ -22,6 +22,11 @@
             <a id="$example2">Example 2</a>
             <a id="$example1">Example 1</a>
         </div>
+        <div class="item" label="Wallet">
+            <select id="$wallet" placeholder="">
+                <option value="null" selected>Select a wallet</option>
+            </select>
+        </div>
         <div class="item" label="Address">
             <input id="$address" placeholder="Enter an address">
         </div>
@@ -37,7 +42,32 @@
     </main>
 </body>
 <script>
+async function getWallets() {
+    let wallets
+    try {
+        wallets = (await bitcoinRPC('listwalletdir', [])).wallets
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    console.log(wallets)
+
+    wallets.forEach((wallet) => {
+        const walletname = wallet.name
+        const $item = document.createElement('option')
+        $item.textContent = walletname ? walletname : '(unnamed wallet)'
+        $item.value = walletname
+        $wallet.append($item)
+    })
+}
+getWallets()
+
+
 async function signMessage() {
+
+    if ($wallet.value === 'null') return
+    const wallet = 'wallet/' + $wallet.value
+    
     resetUI()
     const message = $message.value
     const address = $address.value
@@ -46,7 +76,7 @@ async function signMessage() {
     let signedMsg;
     try {
         // success
-        signedMsg = await bitcoinRPC('signmessage', [address, message])
+        signedMsg = await bitcoinRPC('signmessage', [address, message], wallet)
     } catch (e) {
         // handle error
         $error.textContent = e
@@ -80,7 +110,6 @@ $example2.addEventListener('click', _ => {
     $message.value = 'I love Bitcoin'
     signMessage()
 })
-
 </script>
 
 </html>

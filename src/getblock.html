@@ -103,8 +103,8 @@ async function getBlock() {
         $versionHex.textContent = block.versionHex
         $size.textContent = formatBytesCount(block.size)
         $confirmations.textContent = block.confirmations
-        $time.textContent = new Date(block.time * 1000)
-        $mediantime.textContent = new Date(block.mediantime * 1000)
+        $time.textContent = new Date(block.time * 1000).toLocaleString()
+        $mediantime.textContent = new Date(block.mediantime * 1000).toLocaleString()
     }
 
     if (verbosity == 1) {
@@ -165,6 +165,19 @@ async function getBlock() {
             $vSize.setAttribute('label', 'vSize')
             $vSize.textContent = t.vSize
             $row.append($vSize)
+
+
+            const $vinCount = document.createElement('div')
+            $vinCount.className = 'item'
+            $vinCount.setAttribute('label', '#inputs')
+            $vinCount.textContent = t.vin.length
+            $row.append($vinCount)
+
+            const $voutCount = document.createElement('div')
+            $voutCount.className = 'item'
+            $voutCount.setAttribute('label', '#outputs')
+            $voutCount.textContent = t.vout.length
+            $row.append($voutCount)
 
 
             const $vinDetails = document.createElement('details')

@@ -20,46 +20,76 @@
     <main>
         <h1>Get Wallet Info</h1>
         <x-subtitle>Various wallet state info.</x-subtitle>
+        <div class="item" label="Wallet">
+            <select id="$wallet" placeholder="">
+                <option value="" selected>Select a wallet</option>
+            </select>
+        </div>
         <div class="error" id="$error"></div>
-        <h2>Wallet Info</h2>
-        <div id="$walletname" class="item" label="Wallet Name"></div>
-        <h3>Balance</h3>
-        <div class="row">
-            <div id="$balance" class="item" label="Balance"></div>
-            <div id="$unconfirmed_balance" class="item" label="Unconfirmed"></div>
-            <div id="$immature_balance" class="item" label="Immature"></div>
-            <div id="$txcount" class="item" label="TX count"></div>
-        </div>
-        <h3>Settings</h3>
-        <div class="row">
-            <div id="$walletversion" class="item" label="Wallet Version"></div>
-            <div id="$private_keys_enabled" class="item" label="Private keys enabled"></div>
-            <div id="$avoid_reuse" class="item" label="Avoid reuse"></div>
-            <div id="$descriptors" class="item" label="Descriptors"></div>
-        </div>
-        <div class="row">
-            <div id="$scanning" class="item" label="Scanning"></div>
-            <div id="$paytxfee" class="item" label="Pay TX fee"></div>
-        </div>
-        <div id="$keypoololdest" class="item" label="keypoololdest"></div>
-        <div class="row">
-            <div id="$keypoolsize" class="item" label="keypoolsize"></div>
-            <div id="$keypoolsize_hd_internal" class="item" label="keypoolsize_hd_internal"></div>
-        </div>
-        <div id="$hdseedid" class="item" label="HD seed ID"></div>
+        <section id="$result" hidden="true">
+            <h2>Wallet Info</h2>
+            <div id="$walletname" class="item" label="Wallet Name"></div>
+            <h3>Balance</h3>
+            <div class="row">
+                <div id="$balance" class="item" label="Balance"></div>
+                <div id="$unconfirmed_balance" class="item" label="Unconfirmed"></div>
+                <div id="$immature_balance" class="item" label="Immature"></div>
+                <div id="$txcount" class="item" label="TX count"></div>
+            </div>
+            <h3>Settings</h3>
+            <div class="row">
+                <div id="$walletversion" class="item" label="Wallet Version"></div>
+                <div id="$private_keys_enabled" class="item" label="Private keys enabled"></div>
+                <div id="$avoid_reuse" class="item" label="Avoid reuse"></div>
+                <div id="$descriptors" class="item" label="Descriptors"></div>
+            </div>
+            <div class="row">
+                <div id="$scanning" class="item" label="Scanning"></div>
+                <div id="$paytxfee" class="item" label="Pay TX fee"></div>
+            </div>
+            <div class="row">
+                <div id="$keypoololdest" class="item" label="keypoololdest"></div>
+                <div id="$keypoolsize" class="item" label="keypoolsize"></div>
+                <div id="$keypoolsize_hd_internal" class="item" label="keypoolsize_hd_internal"></div>
+            </div>
+            <div id="$hdseedid" class="item" label="HD seed ID"></div>
+        </section>
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script>
-async function getWalletInfo() {
-
-    let info
+async function getWallets() {
+    let wallets
     try {
-        info = await bitcoinRPC('getwalletinfo')
+        wallets = await bitcoinRPC('listwallets', [])
     } catch (e) {
         $error.textContent = e
         return
     }
+    console.log(wallets)
+    wallets.forEach((walletname) => {
+        const $item = document.createElement('option')
+        $item.textContent = walletname ? walletname : '(unnamed)'
+        $item.value = walletname
+        $wallet.append($item)
+    })
+}
+
+
+async function getWalletInfo() {
+    $error.textContent = ''
+    $result.hidden = true
+
+    const wallet = 'wallet/' + $wallet.value
+
+    let info
+    try {
+        info = await bitcoinRPC('getwalletinfo', [], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    $result.hidden = false
 
     console.log(info)
     $balance.textContent = info.balance + ' BTC'
@@ -76,13 +106,17 @@ async function getWalletInfo() {
     $scanning.textContent = info.scanning
     $paytxfee.textContent = info.paytxfee
 
-    $keypoololdest.textContent = new Date(info.keypoololdest * 1000)
+    const keypoololdest = new Date(info.keypoololdest * 1000)
+    $keypoololdest.textContent = keypoololdest.toLocaleString()
+    $keypoololdest.title = keypoololdest
     $keypoolsize.textContent = info.keypoolsize
     $keypoolsize_hd_internal.textContent = info.keypoolsize_hd_internal
 }
 
 
-getWalletInfo()
+getWallets()
+
+$wallet.addEventListener('change', _ => getWalletInfo())
 </script>
 
 </html>

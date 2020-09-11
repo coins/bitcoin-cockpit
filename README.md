@@ -1,5 +1,5 @@
 # Bitcoin Cockpit
-A simple GUI for bitcoin RPCs.
+A basic GUI for bitcoin RPCs.
 
 ## Disclaimer
 > THIS CODE IS INSECURE! DO NOT USE IN PRODUCTION! 

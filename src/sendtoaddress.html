@@ -26,6 +26,11 @@
         <div class="row-reverse">
             <a id="$example1">Example</a>
         </div>
+        <div class="item" label="Wallet">
+            <select id="$wallet" placeholder="">
+                <option value="null" selected>Select a wallet</option>
+            </select>
+        </div>
         <div class="item" label="Address" title="The bitcoin address to send to.">
             <input id="$address" min="0" max="9000000" placeholder="Enter an address">
         </div>
@@ -63,8 +68,28 @@
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script>
+async function getWallets() {
+    let wallets
+    try {
+        wallets = await bitcoinRPC('listwallets', [])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    console.log(wallets)
+    wallets.forEach((walletname) => {
+        const $item = document.createElement('option')
+        $item.textContent = walletname ? walletname : '(unnamed)'
+        $item.value = walletname
+        $wallet.append($item)
+    })
+}
+getWallets()
+
 async function sendToAddress() {
     resetUI()
+    const wallet = 'wallet/' + $wallet.value
+
     const address = $address.value
     const amount = Number($amount.value)
     const comment = $comment.value
@@ -85,7 +110,7 @@ async function sendToAddress() {
             comment_to,
             subtractfeefromamount,
             replaceable
-        ])
+        ], wallet)
     } catch (e) {
         $error.textContent = e
         return

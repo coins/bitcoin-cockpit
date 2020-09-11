@@ -20,6 +20,11 @@
     <main>
         <h1>Get Addresses by Label</h1>
         <x-subtitle>Returns the list of addresses assigned the specified label.</x-subtitle>
+        <div class="item" label="Wallet">
+            <select id="$wallet" placeholder="">
+                <option value="null" selected>Select a wallet</option>
+            </select>
+        </div>
         <div class="item" label="Label">
             <select id="$label"></select>
         </div>
@@ -29,33 +34,64 @@
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script>
-
-async function getLabels() {
-    let labels
+async function getWallets() {
+    let wallets
     try {
-        labels = await bitcoinRPC('listlabels', [])
+        wallets = await bitcoinRPC('listwallets', [])
     } catch (e) {
         $error.textContent = e
         return
     }
-    labels.forEach((label) => {
+    console.log(wallets)
+
+    wallets.forEach((walletname) => {
         const $item = document.createElement('option')
-        $item.textContent = label ? label : '(unnamed)'
-        $item.value = label
-        $label.append($item)
+        $item.textContent = walletname ? walletname : '(unnamed wallet)'
+        $item.value = walletname
+        $wallet.append($item)
     })
+}
+getWallets()
+
+async function getLabels() {
+    if ($wallet.value === 'null') return
+    resetUI()
+    $label.innerHTML = ''
+    const wallet = 'wallet/' + $wallet.value
+    let labels
+    try {
+        labels = await bitcoinRPC('listlabels', [], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    if (labels.length) {
+        labels.forEach((label) => {
+            const $item = document.createElement('option')
+            $item.textContent = label ? label : '(unnamed label)'
+            $item.value = label
+            $label.append($item)
+        })
+        $label.disabled = false
+    } else {
+        $label.disabled = true
+        const $item = document.createElement('option')
+        $item.textContent = 'No labels yet'
+        $label.append($item)
+    }
 }
 
 
 
 async function getAddresses() {
     resetUI()
+    const wallet = 'wallet/' + $wallet.value
     const label = $label.value
-
 
     let addresses
     try {
-        addresses = await bitcoinRPC('getaddressesbylabel', [label])
+        addresses = await bitcoinRPC('getaddressesbylabel', [label], wallet)
     } catch (e) {
         $error.textContent = e
         return
@@ -77,6 +113,7 @@ function resetUI() {
     $addresses.innerHTML = ''
 }
 
+$wallet.addEventListener('change', e => getLabels())
 $label.addEventListener('change', e => getAddresses())
 
 getLabels()
