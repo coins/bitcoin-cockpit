@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Create Wallet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Create Wallet</h1>
+        <x-subtitle>Creates and loads a new wallet.</x-subtitle>
+        <div class="row-reverse">
+            <a id="$example1">Example 1</a>
+        </div>
+        <div class="item" label="Wallet name">
+            <input id="$walletName" placeholder="Enter a wallet name" title="The name for the new wallet. If this is a path, the wallet will be created at the path location.">
+        </div>
+        <details>
+            <summary>Options</summary>
+        </details>
+        <div class="row-reverse">
+            <button id="$submit">Create Wallet</button>
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Wallet Name</h2>
+        <div id="$name" class="item" label="Wallet Name"></div>
+        <div id="$warning" class="item" label="Warning"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function createWallet() {
+    resetUI()
+    const walletName = $walletName.value
+
+
+    let walletResult
+    try {
+        walletResult = await bitcoinRPC('createwallet', [walletName])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(walletResult)
+    $name.textContent = walletResult.name
+    $warning.textContent = walletResult.warning
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $name.textContent = ''
+    $warning.textContent = ''
+}
+
+$submit.addEventListener('click', e => createWallet())
+
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $walletName.value = 'test_wallet_at_'+ Date.now()
+})
+
+</script>
+
+</html>
