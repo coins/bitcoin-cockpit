@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Addresses by Label</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+
+    h3 {
+        padding-top: 64px;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        margin-top: 64px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>List Transactions</h1>
+        <x-subtitle>If a label name is provided, this will return only incoming transactions paying to addresses with the specified label.<br />
+            Returns up to 'count' most recent transactions skipping the first 'from' transactions.
+        </x-subtitle>
+        <div class="item" label="Wallet">
+            <select id="$wallet" placeholder="">
+                <option value="null" selected>Select a wallet</option>
+            </select>
+        </div>
+        <div id="$error" class="error"></div>
+        <div id="$transactions" class="column"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function getWallets() {
+    let wallets
+    try {
+        wallets = (await bitcoinRPC('listwalletdir', [])).wallets
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    console.log(wallets)
+
+    wallets.forEach((wallet) => {
+        const walletname = wallet.name
+        const $item = document.createElement('option')
+        $item.textContent = walletname ? walletname : '(unnamed wallet)'
+        $item.value = walletname
+        $wallet.append($item)
+    })
+}
+getWallets()
+
+
+async function listTransactions() {
+    resetUI()
+    const wallet = 'wallet/' + $wallet.value
+
+    let transactions
+
+    $transactions.innerHTML = ''
+    try {
+        transactions = await bitcoinRPC('listtransactions', [], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(transactions)
+
+    if (!transactions.length) {
+        $transactions.innerHTML = `No transactions in this wallet yet.`
+    }
+
+    Object.keys(transactions).forEach((tx, index) => {
+        tx = transactions[tx]
+
+        let $heading = document.createElement('h3')
+        $heading.textContent = 'Transaction ' + (index + 1)
+        $transactions.append($heading)
+
+
+        let $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+        const $address = document.createElement('div')
+        $address.className = 'item'
+        $address.textContent = tx.address
+        $address.setAttribute('label', 'Address')
+        $row.append($address)
+
+        const $amount = document.createElement('div')
+        $amount.className = 'item'
+        $amount.textContent = tx.amount + ' BTC'
+        $amount.setAttribute('label', 'Amount')
+        $row.append($amount)
+
+        if (tx.fee) {
+            const $fee = document.createElement('div')
+            $fee.className = 'item'
+            $fee.textContent = tx.fee + ' BTC'
+            $fee.setAttribute('label', 'Fee')
+            $row.append($fee)
+        }
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+
+        const $comment = document.createElement('div')
+        $comment.className = 'item'
+        $comment.textContent = tx.comment
+        $comment.setAttribute('label', 'Comment')
+        $row.append($comment)
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+
+        const $to = document.createElement('div')
+        $to.className = 'item'
+        $to.textContent = tx.to
+        $to.setAttribute('label', 'Recipient Comment')
+        $row.append($to)
+
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+        const $label = document.createElement('div')
+        $label.className = 'item'
+        $label.textContent = tx.label
+        $label.setAttribute('label', 'Label')
+        $row.append($label)
+
+        const $category = document.createElement('div')
+        $category.className = 'item'
+        $category.textContent = tx.category
+        $category.setAttribute('label', 'Category')
+        $row.append($category)
+
+        const $time = document.createElement('div')
+        $time.className = 'item'
+        const time = new Date(tx.time * 1000)
+        $time.textContent = time.toLocaleString()
+        $time.title = time
+        $time.setAttribute('label', 'Time')
+        $row.append($time)
+
+        const $timereceived = document.createElement('div')
+        $timereceived.className = 'item'
+        const timereceived = new Date(tx.timereceived * 1000)
+        $timereceived.textContent = timereceived.toLocaleString()
+        $timereceived.title = timereceived
+        $timereceived.setAttribute('label', 'Time received')
+        $row.append($timereceived)
+
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+        const $txid = document.createElement('div')
+        $txid.className = 'item'
+        $txid.textContent = tx.txid
+        $txid.setAttribute('label', 'TXID')
+        $row.append($txid)
+
+        const $vout = document.createElement('div')
+        $vout.className = 'item'
+        $vout.textContent = tx.vout
+        $vout.setAttribute('label', 'vout')
+        $row.append($vout)
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+        const $bip125_replaceable = document.createElement('div')
+        $bip125_replaceable.className = 'item'
+        $bip125_replaceable.textContent = tx['bip125-replaceable']
+        $bip125_replaceable.title = 'bip125 replaceable'
+        $bip125_replaceable.setAttribute('label', 'Replacable')
+        $row.append($bip125_replaceable)
+
+
+        const $confirmations = document.createElement('div')
+        $confirmations.className = 'item'
+        $confirmations.textContent = tx.confirmations
+        $confirmations.setAttribute('label', 'Confirmations')
+        $row.append($confirmations)
+
+
+        const $trusted = document.createElement('div')
+        $trusted.className = 'item'
+        $trusted.textContent = tx.trusted
+        $trusted.setAttribute('label', 'Trusted')
+        $row.append($trusted)
+    })
+
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $transactions.innerHTML = ''
+}
+
+$wallet.addEventListener('change', e => listTransactions())
+</script>
+
+</html>
