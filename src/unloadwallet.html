@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Unload Wallet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Unload Wallet</h1>
+        <x-subtitle>Unloads the referenced wallet.</x-subtitle>
+        <div class="item" label="Wallet">
+            <select id="$wallet"></select>
+        </div>
+        <div class="row-reverse">
+            <button id="$submit">Unload</button>
+        </div>
+        <div id="$error" class="error"></div>
+        <div id="$warning" class="item" label="Warning"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function getWallets() {
+    let wallets
+    try {
+        wallets = await bitcoinRPC('listwallets', [])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    console.log(wallets)
+    $wallet.innerHTML = '<option value="null" selected>Select a wallet</option>'
+    wallets.forEach((walletname) => {
+        const $item = document.createElement('option')
+        $item.textContent = walletname ? walletname : '(unnamed wallet)'
+        $item.value = walletname
+        $wallet.append($item)
+    })
+}
+getWallets()
+
+
+async function unloadwallet() {
+    resetUI()
+    const wallet = $wallet.value
+    if (!confirm(`Do you want to unload wallet "${wallet}"?`)) {
+        return
+    }
+
+    let result
+    try {
+        result = await bitcoinRPC('unloadwallet', [wallet, null])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(result)
+    $warning.textContent = result.warning
+    getWallets()
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $warning.innerHTML = ''
+}
+
+$wallet.addEventListener('change', e => resetUI())
+$submit.addEventListener('click', e => unloadwallet())
+</script>
+
+</html>
