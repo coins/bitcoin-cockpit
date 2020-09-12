@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Stop Bitcoin</title>
+    <title>Uptime</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
     <style type="text/css">
@@ -18,40 +18,37 @@
         <img src="static/bitcoin_logo.svg" width="120">
     </header>
     <main>
-        <h1>Stop Bitcoin</h1>
-        <x-subtitle>Request a graceful shutdown of Bitcoin Core.</x-subtitle>
-        <div class="row-reverse">
-            <button onclick="stop()">Stop</button>
-        </div>
-        <div class="error" id="$error" hidden></div>
-        <section id="$result" hidden></section>
+        <h1>Uptime</h1>
+        <x-subtitle>Returns the total uptime of the server.</x-subtitle>
+        <div id="$error" class="error"></div>
+        <div id="$result" class="item" label="Total Uptime" title="The number of seconds that the server has been running
+" hidden></div>
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script src="wallet-selector.js"></script>
 <script>
 
-async function stop() {
+async function uptime() {
     $error.hidden = true
     $result.hidden = true
-    
-    if(!confirm('Do you really want to shutdown bitcoin core?'))
-        return
 
-    let info
+    let result
     try {
-        info = await bitcoinRPC('stop')
+        result = await bitcoinRPC('uptime')
     } catch (e) {
         $error.hidden = false
         $error.textContent = e
         return
     }
+
     $result.hidden = false
 
-    console.log(info)
-    $result.textContent = info.str
+    console.log(result)
+    $result.textContent = result +' sec'
 }
 
+uptime()
 </script>
 
 </html>
