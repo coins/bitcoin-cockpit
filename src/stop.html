@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Stop Bitcoin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Stop Bitcoin</h1>
+        <x-subtitle>Request a graceful shutdown of Bitcoin Core.</x-subtitle>
+        <div class="row-reverse">
+            <button onclick="stop()">Stop</button>
+        </div>
+        <div class="error" id="$error"></div>
+        <section id="$result" hidden="true">
+            
+        </section>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
+<script>
+
+async function stop() {
+    if(!confirm('Do you really want to stop bitcoin?'))
+        return
+    $error.textContent = ''
+    $result.hidden = true
+
+    let info
+    try {
+        info = await bitcoinRPC('getwalletinfo', [], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    $result.hidden = false
+
+    console.log(info)
+    $result.textContent = result.str
+}
+
+</script>
+
+</html>
