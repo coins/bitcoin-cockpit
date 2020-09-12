@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Unconfirmed Balance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Unconfirmed Balance</h1>
+        <x-subtitle>DEPRECATED<br>
+            Identical to getbalances().mine.untrusted_pending
+        </x-subtitle>
+        <wallet-selector id="$wallet"></wallet-selector>
+        <div id="$error" class="error"></div>
+        <h3>Unconfirmed Balance</h3>
+        <div id="$unconfirmedBalance" class="item"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
+<script>
+
+
+async function getUnconfirmedBalance() {
+    if ($wallet.value === 'null') return
+    resetUI()
+
+    const wallet = 'wallet/' + $wallet.value
+    let unconfirmedBalance
+    try {
+        unconfirmedBalance = await bitcoinRPC('getunconfirmedbalance', [], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    $unconfirmedBalance.textContent = unconfirmedBalance +' BTC'
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $unconfirmedBalance.innerHTML = ''
+}
+
+$wallet.addEventListener('change', e => getUnconfirmedBalance())
+
+
+</script>
+
+</html>
