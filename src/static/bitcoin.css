@@ -139,11 +139,12 @@ pre {
 .item:before {
     content: attr(label);
     font-size: 13px;
-    color: rgba(0, 0, 0, 0.8);
+    opacity: 0.8;
     margin-bottom: 2px;
 }
 
-.item:empty, .item[hidden] {
+.item:empty,
+.item[hidden] {
     display: none;
 }
 
@@ -169,6 +170,10 @@ pre {
     margin-left: 24px;
 }
 
+.error:empty {
+    display: none;
+}
+
 .error:not(:empty):before {
     content: 'Error: ';
 }
@@ -179,6 +184,13 @@ pre {
     font-size: 20px;
 }
 
-wallet-selector > select {
+.warning {
+    border: 2px solid #FF9800;
+    border-radius: 8px;
+    padding: 24px;
+    margin-top: 64px;
+}
+
+wallet-selector>select {
     width: 100%;
 }

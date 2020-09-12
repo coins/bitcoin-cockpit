@@ -29,6 +29,7 @@ class WalletSelector extends HTMLElement {
         if (wallets.length == 1) {
             $wallet.value = wallets[0]
             $wallet.disabled = true
+            this.dispatchEvent(new CustomEvent('change', { detail: wallets[0] }))
         } else {
             $wallet.innerHTML = '<option value="null" selected disabled>Select a wallet</option>'
         }
