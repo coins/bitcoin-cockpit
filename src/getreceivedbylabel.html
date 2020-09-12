@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Received by Label</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Received by Label</h1>
+        <x-subtitle>Returns the total amount received by addresses with <i>label</i> in transactions with at least <i>[minconf]</i> confirmations.</x-subtitle>
+        <wallet-selector id="$wallet"></wallet-selector>
+        <div class="item" label="Label">
+            <select id="$label"></select>
+        </div>
+        <div id="$error" class="error"></div>
+        <div id="$received" class="item" label="Received"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
+<script>
+
+
+async function getLabels() {
+    if ($wallet.value === 'null') return
+    resetUI()
+    $label.innerHTML = ''
+    const wallet = 'wallet/' + $wallet.value
+    let labels
+    try {
+        labels = await bitcoinRPC('listlabels', [], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    if (labels.length) {
+        $label.innerHTML = '<option value="null" selected disabled>Select a label</option>'
+        labels.forEach((label) => {
+            const $item = document.createElement('option')
+            $item.textContent = label ? label : '(unnamed label)'
+            $item.value = label
+            $label.append($item)
+        })
+        $label.disabled = false
+    } else {
+        $label.innerHTML = ''
+        $label.disabled = true
+        const $item = document.createElement('option')
+        $item.textContent = 'No labels yet'
+        $label.append($item)
+    }
+}
+
+
+
+async function getAddresses() {
+    resetUI()
+    const wallet = 'wallet/' + $wallet.value
+    const label = $label.value
+
+    let received
+    try {
+        received = await bitcoinRPC('getreceivedbylabel', [label], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(received)
+    
+    $received.textContent = received + ' BTC'
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $received.innerHTML = ''
+}
+
+$wallet.addEventListener('change', e => getLabels())
+$label.addEventListener('change', e => getAddresses())
+
+getLabels()
+</script>
+
+</html>
