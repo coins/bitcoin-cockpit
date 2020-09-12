@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Load Wallets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Load Wallets</h1>
+        <x-subtitle>Loads a wallet from a wallet file or directory.<br>
+        Note that all wallet command-line options used when starting bitcoind will be applied to the new wallet (eg -zapwallettxes, rescan, etc).</x-subtitle>
+        <div class="item" label="Wallet">
+            <select id="$wallet"></select>
+        </div>
+        <div class="row-reverse">
+            <button id="$submit">Load Wallet</button>
+        </div>
+        <pre class="error" id="$error"></pre>
+        <h2>Result</h2>
+        <div class="item" label="Name" id="$name"></div>
+        <div class="item" label="Warning" id="$warning"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function listWallets() {
+    let wallets
+
+    try {
+        wallets = (await bitcoinRPC('listwalletdir', [])).wallets
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    console.log(wallets)
+
+    if (wallets.length == 1) {
+        $wallet.value = wallets[0]
+        $wallet.disabled = true
+    } else {
+        $wallet.innerHTML = '<option value="null" selected disabled>Select a wallet</option>'
+    }
+
+    wallets.forEach((wallet) => {
+        const walletname = wallet.name
+        const $item = document.createElement('option')
+        $item.textContent = walletname ? walletname : '(unnamed wallet)'
+        $item.value = walletname
+        $wallet.append($item)
+    })
+}
+
+listWallets()
+
+async function loadwallet() {
+    $error.textContent = ''
+    $name.textContent = ''
+    $warning.textContent = ''
+    const wallet = $wallet.value
+    let result
+
+    try {
+        result = await bitcoinRPC('loadwallet', [wallet])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    console.log(result)
+
+    $name.textContent = result.name
+    $warning.textContent = result.warning
+}
+
+$submit.addEventListener('click', _ => loadwallet())
+</script>
+
+</html>
