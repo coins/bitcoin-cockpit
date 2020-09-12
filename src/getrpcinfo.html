@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get RPC Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+
+    .command {
+        border-top:  1px solid rgba(0,0,0,0.1);
+        padding: 24px 16px;
+    }
+
+    .command .item{
+        margin: 0;
+    }
+
+    .method{
+        width: 160px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get RPC Info</h1>
+        <x-subtitle>Returns details of the RPC server.</x-subtitle>
+        <div class="error" id="$error"></div>
+        <section id="$result" hidden>
+            <h2>RPC Info</h2>
+            <div id="$logpath" class="item" label="Log Path"></div>
+            <h3>Active Commands</h3>
+        </section>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function getRPCInfo() {
+    $error.textContent = ''
+    $result.hidden = true
+
+    let info
+    try {
+        info = await bitcoinRPC('getrpcinfo', [])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    $result.hidden = false
+
+    console.log(info)
+    $logpath.textContent = info.logpath
+
+    info.active_commands.forEach(active_command => {
+        const $row = document.createElement('div')
+        $row.className = 'row command'
+        $result.appendChild($row)
+
+        const $method = document.createElement('div')
+        $method.className = 'item method'
+        $method.textContent = active_command.method
+        $method.title = 'The name of the RPC command'
+        $method.setAttribute('label', 'Method')
+        $row.appendChild($method)
+
+        const $duration = document.createElement('div')
+        $duration.className = 'item'
+        $duration.textContent = active_command.duration + ' μs'
+        $duration.title = 'The running time in microseconds'
+        $duration.setAttribute('label', 'Duration')
+        $row.appendChild($duration)
+    })
+}
+
+getRPCInfo()
+</script>
+
+</html>
