@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Balances</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Balances</h1>
+        <x-subtitle>Returns an object with all balances in BTC.</x-subtitle>
+        <wallet-selector id="$wallet"></wallet-selector>
+        <div id="$error" class="error"></div>
+        <h3>Result</h3>
+        <h4>Mine</h4>
+        <div class="row">
+            <div id="$immature" class="item" label="Immature"></div>
+            <div id="$trusted" class="item" label="Trusted"></div>
+            <div id="$untrusted_pending" class="item" label="Untrusted pending"></div>
+        </div>
+        <h4>Watchonly</h4>
+        <div class="row">
+            <div id="$immature_watchonly" class="item" label="Immature"></div>
+            <div id="$trusted_watchonly" class="item" label="Trusted"></div>
+            <div id="$untrusted_pending_watchonly" class="item" label="Untrusted pending"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
+<script>
+async function getBalances() {
+    if ($wallet.value === 'null') return
+    resetUI()
+
+    const wallet = 'wallet/' + $wallet.value
+    let balances
+
+    try {
+        balances = await bitcoinRPC('getbalances', [], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    console.log(balances)
+
+    $immature.textContent = balances.mine.immature
+    $trusted.textContent = balances.mine.trusted
+    $untrusted_pending.textContent = balances.mine.untrusted_pending
+
+    $immature_watchonly.textContent = balances.watchonly.immature
+    $trusted_watchonly.textContent = balances.watchonly.trusted
+    $untrusted_pending_watchonly.textContent = balances.watchonly.untrusted_pending
+}
+
+function resetUI() {
+    $error.textContent = ''
+    // $received.innerHTML = ''
+}
+
+$wallet.addEventListener('change', e => getBalances())
+</script>
+
+</html>
