@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>List Unspent</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+
+    h3 {
+        padding-top: 64px;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        margin-top: 64px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>List Unspent</h1>
+        <x-subtitle>
+            Returns array of unspent transaction outputs
+            with between minconf and maxconf (inclusive) confirmations.<br>
+            Optionally filter to only include txouts paid to specified addresses.<br>
+        </x-subtitle>
+        <wallet-selector id="$wallet"></wallet-selector>
+        <details>
+            <summary>Filters</summary>
+            <div class="row">
+                <div class="item" label="Min confirmations" title="The minimum confirmations to filter">
+                    <input id="$minconf" type="number" min="0" value="0">
+                </div>
+                <div class="item" label="Max confirmations" title="The maximum confirmations to filter">
+                    <input id="$maxconf" type="number" min="0" value="999999">
+                </div>
+                <div class="item" label="Include unsafe" title="Include outputs that are not safe to spend See description of 'safe' attribute below.">
+                    <label>
+                        <input id="$include_unsafe" type="checkbox" checked="true">Include unsafe
+                    </label>
+                </div>
+            </div>
+            <div class="item" label="Addresses to filter" title="The bitcoin addresses to filter (comma separated)">
+                <textarea id="$addresses" type="number" min="0" value="0" placeholder="Enter addresses (comma separated)"></textarea>
+            </div>
+        </details>
+        <div class="row-reverse">
+            <button onclick="listTransactions()">List Unspent</button>
+        </div>
+        <div id="$error" class="error"></div>
+        <h2>Unspent Outputs</h2>
+        <div id="$transactions" class="column"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
+<script>
+async function listTransactions() {
+    resetUI()
+    const wallet = 'wallet/' + $wallet.value
+
+    const minconf = Number($minconf.value)
+    const maxconf = Number($maxconf.value)
+    const include_unsafe = $include_unsafe.checked
+    let addresses = $addresses.value.split(',')
+    if (addresses[0] === '') addresses = []
+
+    let transactions
+
+    $transactions.innerHTML = ''
+    try {
+        transactions = await bitcoinRPC('listunspent', [minconf, maxconf, addresses, include_unsafe], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(transactions)
+
+    if (!transactions.length) {
+        $transactions.innerHTML = `No unspent outputs match this filter.`
+    }
+
+    Object.keys(transactions).forEach((tx, index) => {
+        tx = transactions[tx]
+
+        let $heading = document.createElement('h3')
+        $heading.textContent = 'Transaction ' + (index + 1)
+        $transactions.append($heading)
+
+
+        let $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+
+        const $label = document.createElement('div')
+        $label.className = 'item'
+        $label.textContent = tx.label
+        $label.setAttribute('label', 'Label')
+        $row.append($label)
+
+
+        const $address = document.createElement('div')
+        $address.className = 'item'
+        $address.textContent = tx.address
+        $address.setAttribute('label', 'Address')
+        $row.append($address)
+
+        const $amount = document.createElement('div')
+        $amount.className = 'item'
+        $amount.textContent = tx.amount + ' BTC'
+        $amount.setAttribute('label', 'Amount')
+        $row.append($amount)
+
+        if (tx.fee) {
+            const $fee = document.createElement('div')
+            $fee.className = 'item'
+            $fee.textContent = tx.fee + ' BTC'
+            $fee.setAttribute('label', 'Fee')
+            $row.append($fee)
+        }
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+
+
+
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+        const $txid = document.createElement('div')
+        $txid.className = 'item'
+        $txid.textContent = tx.txid
+        $txid.setAttribute('label', 'TXID')
+        $row.append($txid)
+
+        const $vout = document.createElement('div')
+        $vout.className = 'item'
+        $vout.textContent = tx.vout
+        $vout.setAttribute('label', 'vout')
+        $row.append($vout)
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $transactions.append($row)
+
+
+
+        const $spendable = document.createElement('div')
+        $spendable.className = 'item'
+        $spendable.textContent = tx.spendable
+        $spendable.title = 'Whether we have the private keys to spend this output'
+        $spendable.setAttribute('label', 'Spendable')
+        $row.append($spendable)
+
+        const $safe = document.createElement('div')
+        $safe.className = 'item'
+        $safe.textContent = tx.safe
+        $safe.setAttribute('label', 'Safe')
+        $row.append($safe)
+
+
+        const $confirmations = document.createElement('div')
+        $confirmations.className = 'item'
+        $confirmations.textContent = tx.confirmations
+        $confirmations.setAttribute('label', 'Confirmations')
+        $row.append($confirmations)
+
+
+
+        const $reused = document.createElement('div')
+        $reused.className = 'item'
+        $reused.textContent = tx.reused
+        $reused.setAttribute('label', 'Reused')
+        $row.append($reused)
+
+        const $desc = document.createElement('div')
+        $desc.className = 'item'
+        $desc.textContent = tx.desc
+        $desc.setAttribute('label', 'Descriptor')
+        $transactions.append($desc)
+
+        const $scriptPubKey = document.createElement('div')
+        $scriptPubKey.className = 'item'
+        $scriptPubKey.textContent = tx.scriptPubKey
+        $scriptPubKey.setAttribute('label', 'ScriptPubkey')
+        $transactions.append($scriptPubKey)
+
+        const $redeemScript = document.createElement('div')
+        $redeemScript.className = 'item'
+        $redeemScript.textContent = tx.redeemScript
+        $redeemScript.setAttribute('label', 'Redeem Script')
+        $transactions.append($redeemScript)
+
+        const $witnessScript = document.createElement('div')
+        $witnessScript.className = 'item'
+        $witnessScript.textContent = tx.witnessScript
+        $witnessScript.setAttribute('label', 'Witness Script')
+        $transactions.append($witnessScript)
+    })
+
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $transactions.innerHTML = ''
+}
+
+$wallet.addEventListener('change', e => listTransactions())
+$minconf.addEventListener('change', e => listTransactions())
+$maxconf.addEventListener('change', e => listTransactions())
+</script>
+
+</html>
