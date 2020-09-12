@@ -29,7 +29,10 @@
             <button id="$submit">Submit</button>
         </div>
         <div id="$error" class="error"></div>
-        <div id="$privKey" class="item" label="Private Key"></div>
+        <div id="$result" hidden>
+            <h3>Private Key</h3>
+            <div id="$privKey" class="item" label="Private Key"></div>
+        </div>
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
@@ -47,7 +50,7 @@ async function dumpPrivKey() {
         $error.textContent = e
         return
     }
-
+    $result.hidden = false
     console.log(privKey)
     $privKey.textContent = privKey
 
@@ -55,7 +58,7 @@ async function dumpPrivKey() {
 
 function resetUI() {
     $error.textContent = ''
-    $privKey.innerHTML = ''
+    $result.hidden = true
 }
 
 $wallet.addEventListener('change', e => resetUI())

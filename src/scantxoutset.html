@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Scan UTXO set</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style>
+        textarea{
+            height: 160px;
+        }
+        input{
+            width: 100px;
+        }
+        .row > .item{
+            margin-right: 24px;
+        }
+
+        h3 {
+            padding-top: 64px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            margin-top: 64px;
+        }
+
+        .utxos:empty:before{
+            content: 'No results.'
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <div class="warning">
+            EXPERIMENTAL warning: this call may be removed or changed in future releases.
+        </div>
+        <h1>Scan UTXO set</h1>
+        <x-subtitle>Scans the unspent transaction output set for entries that match certain output descriptors.</x-subtitle>
+        <section class="action-scan">
+            <div class="row-reverse">
+                <a id="$example2">Example 2</a>
+                <a id="$example1">Example 1</a>
+            </div>
+            <div class="item" label="Descriptor">
+                <textarea id="$descriptor" placeholder="Paste a descriptor here"></textarea>
+            </div>
+            <div class="row">
+                <div class="item" label="Start Index">
+                    <input id="$startIndex" value="0" type="number" min="0">
+                </div>
+                <div class="item" label="End Index">
+                    <input id="$endIndex" value="10" type="number" min="0">
+                </div>
+            </div>
+            <div class="row-reverse">
+                <button id="$submitScan">Scan UTXO set</button>
+            </div>
+            <div class="row-reverse" id="$loading" hidden>
+                <div class="item">
+                    <progress id="$progress" value="0" min="0" max="100">
+                </div>
+                <a id="$submitAbort">Abort scan</a>
+            </div>
+            </div>
+            <div class="error" id="$error"></div>
+        </section>
+        <section id="$result" hidden>
+            <h1>Scan Results</h1>
+            <div class="row">
+                <div class="item" id="$total_amount" label="Total Amount"></div>
+                <div class="item" id="$txouts" label="TXouts" title="The number of unspent transaction outputs scanned"></div>
+                <div class="item" id="$utxoCount" label="#UTXOs"></div>
+                <div class="item" id="$success" label="Success"></div>
+            </div>
+            <div class="row">
+                <div class="item" id="$height" label="Height"></div>
+                <div class="item" id="$bestblock" label="Best Block"></div>
+            </div>
+            <h2>Unspent Outputs</h2>
+            <div id="$utxos" class="utxos"></div>
+        </section>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function scan() {
+    // Reset UI
+    $result.hidden = true
+    $error.hidden = true
+
+    // Input Values
+    const descriptor = $descriptor.value.trim()
+    const startIndex = Number($startIndex.value)
+    const endIndex = Number($endIndex.value)
+
+    const isRange = descriptor.indexOf('*') > -1
+
+    let outputs;
+
+    setTimeout(_ => status(), 1000)
+    $submitScan.hidden = true
+    $loading.hidden = false
+    try {
+        if (isRange)
+            outputs = await bitcoinRPC('scantxoutset', ['start',
+                [{ desc: descriptor, range: [startIndex, endIndex] }]
+            ])
+        else
+            outputs = await bitcoinRPC('scantxoutset', ['start', [descriptor]])
+    } catch (e) {
+        $error.hidden = false
+        $submitScan.hidden = false
+        $loading.hidden = true
+        $error.textContent = e
+        return
+    }
+    console.log(outputs)
+
+    $result.hidden = false
+
+    $bestblock.textContent = outputs.bestblock
+    $height.textContent = outputs.height
+
+
+    $success.textContent = outputs.success
+    $total_amount.textContent = outputs.total_amount + ' BTC'
+    $txouts.textContent = outputs.txouts
+    $utxoCount.textContent = outputs.utxoCount
+
+    $utxos.innerHTML = ''
+    outputs.unspents.forEach((output, index) => {
+
+        $heading = document.createElement('h3')
+        $heading.textContent = 'Unspent Output ' + (index + 1)
+        $utxos.append($heading)
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $utxos.append($row)
+
+        const $txid = document.createElement('div')
+        $txid.className = 'item'
+        $txid.textContent = output.txid
+        $txid.setAttribute('label', 'TXID')
+        $row.append($txid)
+
+        const $vout = document.createElement('div')
+        $vout.className = 'item'
+        $vout.textContent = output.vout
+        $vout.setAttribute('label', 'vout')
+        $row.append($vout)
+
+        $row = document.createElement('div')
+        $row.className = 'row'
+        $utxos.append($row)
+
+        const $amount = document.createElement('div')
+        $amount.className = 'item'
+        $amount.textContent = output.amount + ' BTC'
+        $amount.setAttribute('label', 'Amount')
+        $row.append($amount)
+
+        const $height = document.createElement('div')
+        $height.className = 'item'
+        $height.textContent = output.height
+        $height.setAttribute('label', 'Height')
+        $row.append($height)
+
+        const $scriptPubKey = document.createElement('div')
+        $scriptPubKey.className = 'item'
+        $scriptPubKey.textContent = output.scriptPubKey
+        $scriptPubKey.setAttribute('label', 'ScriptPubKey')
+        $utxos.append($scriptPubKey)
+
+        const $desc = document.createElement('div')
+        $desc.className = 'item'
+        $desc.textContent = output.desc
+        $desc.setAttribute('label', 'Descriptor')
+        $utxos.append($desc)
+
+    })
+}
+
+
+async function status() {
+
+    let statusMsg;
+
+    try {
+        statusMsg = await bitcoinRPC('scantxoutset', ['status'])
+    } catch (e) {
+        $error.hidden = false
+        $error.textContent = e
+        return
+    }
+
+    console.log(statusMsg)
+
+    if (!statusMsg) {
+        $loading.hidden = true
+        $progress.value = 0
+        $submitScan.hidden = false
+        return
+    }
+
+    $loading.hidden = false
+    $submitScan.hidden = true
+
+    $progress.value = statusMsg.progress
+
+    setTimeout(_ => status(), 800)
+}
+
+
+
+async function abort() {
+    if(!confirm('Do you really want to abort this scan?'))
+        return
+
+    let result;
+    try {
+        result = await bitcoinRPC('scantxoutset', ['abort'])
+    } catch (e) {
+        $error.hidden = false
+        $error.textContent = e
+        return
+    }
+
+    console.log(result)
+}
+
+status()
+
+$submitScan.addEventListener('click', e => scan())
+$submitAbort.addEventListener('click', e => abort())
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $descriptor.value = `addr(1K9zQ8f4iTyhKyHWmiDKt21cYX2QSDckWB)`
+})
+
+$example2.addEventListener('click', _ => {
+    $descriptor.value = `pkh([c7258184]04a489a27cdd1e717af90ada3e87e537648980d646a09498d51cbc8fecc54cfa43ffff106c1c2b8823c5e88eead7a641beb01617daf5cf1a82bc8357751bc3fb5a)#m5e8ata8`
+})
+</script>
+
+</html>

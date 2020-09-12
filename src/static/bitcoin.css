@@ -143,9 +143,12 @@ pre {
     margin-bottom: 2px;
 }
 
-.item:empty,
-.item[hidden] {
+.item:empty{
     display: none;
+}
+
+[hidden] {
+    display: none !important;
 }
 
 .row {
