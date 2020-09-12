@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Sign Message</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <script src="static/bitcoin-rpc.js"></script>
+    
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Set Label</h1>
+        <x-subtitle>
+            Sets the label associated with the given address.
+        </x-subtitle>
+        <wallet-selector id="$wallet"></wallet-selector>
+        <div class="item" label="Address">
+            <input id="$address" placeholder="Enter an address">
+        </div>
+        <div class="item" label="Label">
+            <input id="$label" placeholder="Enter an label">
+        </div>
+        <div class="row-reverse">
+            <button id="$submit">Set Label</button>
+        </div>
+        <div id="$error" class="error"></div>
+        <h2>Result</h2>
+        <div id="$result" class="item" label="Signed Message (base64 encoded)"></div>
+    </main>
+</body>
+<script src="wallet-selector.js"></script>
+<script>
+async function setLabel() {
+    
+    const wallet = 'wallet/' + $wallet.value
+    
+    resetUI()
+    const address = $address.value
+    const label = $label.value
+
+    // Make RPC call
+    let result;
+    try {
+        // success
+        result = await bitcoinRPC('setlabel', [address, label], wallet)
+    } catch (e) {
+        // handle error
+        $error.textContent = e
+        return
+    }
+
+    console.log(result)
+
+    $result.textContent = result
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $result.textContent = ''
+}
+
+$submit.addEventListener('click', e => setLabel())
+
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $address.value = '1K9zQ8f4iTyhKyHWmiDKt21cYX2QSDckWB'
+    $message.value = 'Hello World'
+    setLabel()
+})
+
+$example2.addEventListener('click', _ => {
+    $address.value = '1K9zQ8f4iTyhKyHWmiDKt21cYX2QSDckWB'
+    $message.value = 'I love Bitcoin'
+    setLabel()
+})
+</script>
+
+</html>
