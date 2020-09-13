@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Descriptor Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style>
+    textarea {
+        height: 160px;
+    }
+
+    input {
+        width: 100px;
+    }
+
+    .row>.item {
+        margin-right: 24px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Descriptor Info</h1>
+        <x-subtitle>Analyses a descriptor.</x-subtitle>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
+        <div class="item" label="Descriptor:">
+            <textarea id="$descriptor" placeholder="Paste a descriptor here"></textarea>
+        </div>
+        <div class="row-reverse">
+            <button id="$submit">Get Info</button>
+        </div>
+        <div class="error" id="$error"></div>
+        <div id="$result" hidden>
+            <h2>Descriptor Info</h2>
+            <div class="row">
+                <div id="$checksum" class="item" label="Checksum"></div>
+                <div id="$issolvable" class="item" label="isSolvable"></div>
+                <div id="$isrange" class="item" label="isRange"></div>
+                <div id="$hasprivatekeys" class="item" label="has priv keys"></div>
+            </div>
+            <div id="$descriptorResult" class="item" label="Descriptor"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function deriveAddresses() {
+    // Reset UI
+    $error.textContent = ''
+    $result.hidden = true
+
+    // Input Values
+    const descriptor = $descriptor.value.trim()
+
+    const isRange = descriptor.indexOf('*') > -1
+
+    let info;
+
+    try {
+        info = await bitcoinRPC('getdescriptorinfo', [descriptor])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    $result.hidden = false
+
+    $descriptorResult.textContent = info.descriptor
+    $checksum.textContent = info.checksum
+    $isrange.textContent = info.isrange
+    $issolvable.textContent = info.issolvable
+    $hasprivatekeys.textContent = info.hasprivatekeys
+}
+
+$submit.addEventListener('click', e => deriveAddresses())
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $descriptor.value = `sh(wsh(multi(1,03f28773c2d975288bc7d1d205c3748651b075fbc6610e58cddeeddf8f19405aa8,03499fdf9e895e719cfd64e67f07d38e3226aa7b63678949e6e49b241a60e823e4,02d7924d4f7d43ea965a465ae3095ff41131e5946f3c85f79e44adbcf8e27e080e)))`
+    deriveAddresses()
+})
+
+$example2.addEventListener('click', _ => {
+    $descriptor.value = `sh(sortedmulti(3,xpub6BG19sAxMMdQP1mcXaDYqkDdoeUQtzw7DHjr9M1rh3vJpcFJJbNUidMsuMbfvMbJ1H9K7boBvaMy1Q1jHa9UXTmzxg3KDto7h6pZpYTrM6Q/0/*,xpub6ATyc4yRJ1vo1JT4Ro5asfBEpEVfFGBFMuHvJhBsbbvGe9pctVarxsPJpeAnsV1zZpzrZ8NFTby9ihMysjsHkHTnDLr9sY6x8k3PuRZF524/0/*,xpub6AAQ7FoVcjpeP8iRFDWRySaEGdLyCA7wHKVGXknKawVkL5dVA3kgrjRfeA1a7DsfSk7MqGEYvv7cCMaK73hCUzfe2tDuc8aNGmXeiSVq43R/0/*,xprv9s21ZrQH143K2bpgrXNezh2wQLmbLXZqvxX21GdCpyJZjvpgy1Y1EMaXCuALw9GWgBi4JVftSdEZTTdEPnAUnTzyCPy88TxF5dvJHsLy14x/0'/0'/0/*,xpub6APdkAEeCs4tv52hCr1tvGTmsN1V3dXpFnBoyaYkrmJ78rosCUuv1pAUoQWPy7R9MubfsaKUQk6x6xvghRXDw4DP4mwNcMs7UVSrDGPmyST/0/*))`
+    deriveAddresses()
+})
+</script>
+
+</html>
