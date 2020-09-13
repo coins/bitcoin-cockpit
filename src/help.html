@@ -15,7 +15,9 @@
     <main>
         <h1>Help</h1>
         <x-subtitle>List all commands, or get help for a specified command.</x-subtitle>
-        <select id="$command"></select>
+        <select id="$command">
+            <option value="" selected>Select a command</option>
+        </select>
         <div class="error" id="$error"></div>
         <h2 id="$heading">Help</h2>
         <a id="$link"></a>
@@ -23,54 +25,35 @@
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
+<script src="static/commands.js"></script>
 <script>
 async function listCommands() {
 
     $heading.textContent = 'Help'
 
-    let help
-    try {
-        help = await bitcoinRPC('help')
-    } catch (e) {
-        $error.textContent = e
-        return
-    }
 
-    console.log(help)
+    Object.keys(COMMANDS).forEach(groupName => {
+        const group = COMMANDS[groupName]
 
-    $help.textContent = help
+        const $group = document.createElement('optgroup')
+        $group.label = groupName
 
-    const $item = document.createElement('option')
-    $item.value = ''
-    $item.textContent = 'Select Command'
-    $command.append($item)
-
-    $link.textContent = ''
-
-    help
-        .split('\n')
-        .filter(command => command && !command.startsWith('=='))
-        .map(command => command.split(' ')[0])
-        .forEach(command => {
-
-            // if (!command.startsWith('==')) {
-            //     const $item = document.createElement('optgroup')
-            //     $item.label
-            //     return
-            // } 
-
+        group.forEach( command => {
             const $item = document.createElement('option')
             $item.textContent = command
             $item.value = command
-            $command.append($item)
+            $group.append($item)
         })
+        $command.append($group)
+    })
+
+
 }
 
 listCommands()
 
 async function help() {
     const command = $command.value
-
 
     let help
     try {
@@ -86,10 +69,9 @@ async function help() {
     $link.textContent = command
 
     $help.textContent = help
-    $heading.textContent = `Help "${command}"` 
+    $heading.textContent = `Help "${command}"`
 }
-
-
+help()
 $command.addEventListener('change', e => help())
 </script>
 
