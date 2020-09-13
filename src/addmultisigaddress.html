@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Add MultiSig Address</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    .quorum {
+        width: 64px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Add MultiSig Address</h1>
+        <x-subtitle>Add an nrequired-to-sign multisignature address to the wallet. Requires a new wallet backup.
+            Each key is a Bitcoin address or hex-encoded public key.
+            This functionality is only intended for use with non-watchonly addresses.
+            See `importaddress` for watchonly p2sh address support.
+            If 'label' is specified, assign address to that label.
+        </x-subtitle>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
+        <wallet-selector id="$wallet"></wallet-selector>
+        <div class="row">
+            <div class="item" label="Required (m)">
+                <input type="range" id="$required" min="1" max="15" value="2" step="1">
+            </div>
+            <div class="item quorum" label="Quorum" id="$quorum">
+            </div>
+            <div class="item" label="Cosigners (n)">
+                <input type="range" id="$cosigners" min="1" max="15" value="3" step="1">
+            </div>
+        </div>
+        <div id="$keys"></div>
+        <details>
+            <summary>Options</summary>
+            <div class="item" label="Address Type">
+                <select id="$address_type">
+                    <option value="legacy" selected>legacy</option>
+                    <option value="p2sh-segwit">p2sh-segwit</option>
+                    <option value="bech32">bech32</option>
+                </select>
+            </div>
+            <div class="item" label="Label" title="A label to assign the addresses to.">
+                <input id="$label" placeholder="Enter label for address">
+            </div>
+        </details>
+        <div class="row-reverse">
+            <button id="$submit">Add MultiSig</button>
+        </div>
+        <div id="$error" class="error"></div>
+        <div id="$result" hidden>
+            <h2>MultiSig</h2>
+            <div id="$address" class="item" label="Address"></div>
+            <div id="$descriptor" class="item" label="Descriptor"></div>
+            <div id="$redeemScript" class="item" label="Redeem Script"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
+<script>
+async function createMultiSig() {
+    $result.hidden = true
+    $error.textContent = ''
+
+    const wallet = 'wallet/' + $wallet.value
+    const keys = Array.from($keys.querySelectorAll('input')).map(i => i.value)
+    const nrequired = Number($required.value)
+    const label = $label.value
+    const address_type = $address_type.value
+
+    let multisig
+    try {
+        multisig = await bitcoinRPC('addmultisigaddress', [nrequired, keys, label, address_type], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(multisig)
+
+    $result.hidden = false
+    $address.textContent = multisig.address
+    $descriptor.textContent = multisig.descriptor
+    $redeemScript.textContent = multisig.redeemScript
+
+}
+
+function updateSigners() {
+    $result.hidden = true
+    const cosigners = Number($cosigners.value)
+    let required = Number($required.value)
+
+    $required.max = cosigners
+    if (required > cosigners) {
+        $required.value = cosigners
+        required = cosigners
+    }
+
+
+    $quorum.textContent = required + '-of-' + cosigners
+
+    // Update number of key inputs
+    let currentSigners = $keys.querySelectorAll('input').length
+    if (currentSigners < cosigners) {
+        for (let i = currentSigners; i < cosigners; i++) {
+            const $item = document.createElement('div')
+            $item.className = 'item'
+            $item.setAttribute('label', 'Cosigner ' + (i + 1))
+            $item.title = 'The hex-encoded public key'
+            $keys.appendChild($item)
+
+            const $input = document.createElement('input')
+            $input.placeholder = 'Enter public key of cosigner ' + (i + 1)
+            $item.appendChild($input)
+        }
+    } else {
+        while (currentSigners > cosigners) {
+            const lastChild = $keys.querySelectorAll('.item')[currentSigners - 1]
+            $keys.removeChild(lastChild)
+            currentSigners--
+        }
+    }
+}
+
+
+
+$cosigners.addEventListener('change', e => updateSigners())
+$required.addEventListener('change', e => updateSigners())
+$submit.addEventListener('click', e => createMultiSig())
+updateSigners()
+
+
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $example.title = 'Add a multisig address from 2 addresses'
+    $cosigners.value = 2
+    $required.value = 2
+
+    $label.textContent = 'This is a test label'
+    updateSigners()
+
+    $keys.querySelectorAll('input')[0].value = '03789ed0bb717d88f7d321a368d905e7430207ebbd82bd342cf11ae157a7ace5fd'
+    $keys.querySelectorAll('input')[1].value = '03dbc6764b8884a92e871274b87583e6d5c2a58819473e17e107ef3f6aa5a61626'
+})
+
+$example2.addEventListener('click', _ => {
+    $cosigners.value = 3
+    $required.value = 2
+    updateSigners()
+
+    $label.textContent = 'This is another test label'
+    $keys.querySelectorAll('input')[0].value = '03789ed0bb717d88f7d321a368d905e7430207ebbd82bd342cf11ae157a7ace5fd'
+    $keys.querySelectorAll('input')[1].value = '03dbc6764b8884a92e871274b87583e6d5c2a58819473e17e107ef3f6aa5a61626'
+    $keys.querySelectorAll('input')[2].value = '03dbc6764b8884a92e871274b87583e6d5c2a58819473e17e107ef3f6aa5a61626'
+})
+</script>
+
+</html>
