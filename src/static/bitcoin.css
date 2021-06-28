@@ -185,6 +185,7 @@ pre {
     margin: 16px 0;
     color: red;
     font-size: 20px;
+    white-space: pre-wrap;
 }
 
 .warning {

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Create Raw Transaction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+
+    .txid {
+        width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Create Raw Transaction</h1>
+        <x-subtitle>Create a transaction spending the given inputs and creating new outputs. Outputs can be addresses or data. Returns hex-encoded raw transaction.<br>
+            Note that the transaction's inputs are not signed, and it is not stored in the wallet or transmitted to the network.
+        </x-subtitle>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
+        <h3>Inputs</h3>
+        <div class="row">
+            <div class="item txid" label="TXID">
+                <input id="$txid" placeholder="Enter a Transaction ID">
+            </div>
+            <div class="item" label="vOut">
+                <input id="$vout" type="number" min="0" max="9999">
+            </div>
+        </div>
+        <h3>Outputs</h3>
+        <div class="row">
+            <div class="item txid" label="Recipient address">
+                <input id="$address" placeholder="Enter the recipient's address">
+            </div>
+            <div class="item" label="BTC Value">
+                <input id="$value" type="number" min="0" step="0.00001">
+            </div>
+        </div>
+        <details>
+            <summary>Options</summary>
+            <div class="row">
+                <div class="item" label="Locktime">
+                    <input id="$locktime" type="number" min="0" max="999999">
+                </div>
+                <div class="item" label="Replaceable">
+                    <label>
+                        <input id="$replaceable" type="checkbox">
+                        Replaceable
+                    </label>
+                </div>
+            </div>
+        </details>
+        <div class="row-reverse">
+            <button onclick="createRawTransaction()">Create TX</button>
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Transaction</h2>
+        <div id="$hash" class="item" label="Hex encoded transaction"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script>
+async function createRawTransaction() {
+    resetUI()
+    const txid = $txid.value
+    const vout = Number($vout.value)
+
+    const address = $address.value
+    const value = Number($value.value)
+
+    const input = { txid, vout, sequence: 0 }
+    const output = {}
+    output[address] = value
+
+    const locktime = Number($locktime.value)
+    const replaceable = $replaceable.checked
+
+    let block
+    try {
+        block = await bitcoinRPC('createrawtransaction', [
+            [input],
+            [output],
+            locktime,
+            replaceable
+        ])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(block)
+    $hash.textContent = block
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $hash.textContent = ''
+}
+
+$txid.addEventListener('input', e => createRawTransaction())
+
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $txid.value = 'd6f72aab8ff86ff6289842a0424319bf2ddba85dc7c52757912297f948286389'
+    $vout.value = 0
+
+    $address.value = '3QJmV3qfvL9SuYo34YihAf3sRCW3qSinyC'
+    $value.value = 0.01
+})
+
+
+</script>
+
+</html>

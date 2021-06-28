@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Analyze PSBT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Analyze PSBT</h1>
+        <x-subtitle>Analyzes and provides information about the current status of a PSBT and its inputs.</x-subtitle>
+        <div class="row-reverse">
+            <a id="$example2">Example 2</a>
+            <a id="$example1">Example 1</a>
+        </div>
+        <div class="item" label="Block hash">
+            <input id="$blockId" placeholder="Enter a block hash">
+        </div>
+        <div class="item" label="Verbosity">
+            <select id="$verbosity">
+                <option value="1">An object with information about blockheader 'hash'</option>
+                <option value="0">A string that is serialized, hex-encoded data for blockheader 'hash'</option>
+            </select>
+        </div>
+        <div class="error" id="$error"></div>
+        <h2>Block Header</h2>
+        <div id="$hash" class="item" label="Block hash"></div>
+        <div id="$previousblockhash" class="item" label="Previous Block Hash"></div>
+        <div id="$time" class="item" label="Time"></div>
+        <div id="$mediantime" class="item" label="Median Time"></div>
+        <div class="row">
+            <div id="$height" class="item" label="Block Height"></div>
+            <div id="$confirmations" class="item" label="Confirmations"></div>
+            <div id="$version" class="item" label="Version"></div>
+            <div id="$versionHex" class="item" label="Version Hex"></div>
+        </div>
+        <div class="row">
+        </div>
+        <div id="$blockhex" class="item" label="Hex encoded header"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script type="text/javascript">
+async function getBlockHeader() {
+    resetUI()
+    const blockId = $blockId.value
+    const verbosity = Boolean(Number($verbosity.value))
+
+    if (blockId == '')
+        return
+
+    let block
+    try {
+        block = await bitcoinRPC('getblockheader', [blockId, verbosity])
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(block)
+
+    if (verbosity == 0) {
+        $blockhex.textContent = block
+    }
+
+    if (verbosity == 1) {
+
+        $hash.textContent = block.hash
+        $previousblockhash.textContent = block.previousblockhash
+        $height.textContent = block.height
+        $version.textContent = block.version
+        $versionHex.textContent = block.versionHex
+        $confirmations.textContent = block.confirmations
+        $time.textContent = new Date(block.time * 1000)
+        $mediantime.textContent = new Date(block.mediantime * 1000)
+    }
+
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $blockhex.textContent = ''
+    $hash.textContent = ''
+    $height.textContent = ''
+    $confirmations.textContent = ''
+    $time.textContent = ''
+    $mediantime.textContent = ''
+    $previousblockhash.textContent = ''
+    $version.textContent = ''
+    $versionHex.textContent = ''
+}
+
+$blockId.addEventListener('input', e => getBlockHeader())
+$verbosity.addEventListener('input', e => getBlockHeader())
+
+function formatBytesCount(bytesCount) {
+    return Math.round(bytesCount / 1e6 * 100) / 100 + ' MB'
+}
+
+/**
+ *
+ *  Examples
+ * 
+ */
+$example1.addEventListener('click', _ => {
+    $blockId.value = '000000000000000000020ff2893a89579d3e3db4ae4abbea3b021a11d73a92b3'
+    $verbosity.value = 1
+    getBlockHeader()
+})
+
+$example2.addEventListener('click', _ => {
+    $blockId.value = '00000000000000000008445ce0f0f34c543195c07d599af3452ee3a6cfc1c03d'
+    $verbosity.value = 0
+    getBlockHeader()
+})
+</script>
+
+</html>
