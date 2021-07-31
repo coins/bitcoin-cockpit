@@ -32,6 +32,7 @@
             <div id="$pruneheight" class="item" label="Prune Height"></div>
         </div>
         <div id="$warnings" class="item warning" label="Warnings"></div>
+        <div id="$error" class="item error" label="Error"></div>
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
@@ -41,7 +42,7 @@ function setInfo(info) {
     $bestblockhash.textContent = info.bestblockhash
     $blocks.textContent = info.blocks
     $headers.textContent = info.headers
-    
+
     const mediantime = new Date(info.mediantime * 1000)
     $mediantime.textContent = mediantime.toLocaleString()
     $mediantime.title = mediantime
@@ -66,7 +67,9 @@ function formatPercent(fraction) {
     return Math.round(fraction * 100 * 100) / 100 + '%'
 }
 
-bitcoinRPC('getblockchaininfo').then(setInfo)
+bitcoinRPC('getblockchaininfo')
+    .then(setInfo)
+    .catch(e => $error.textContent = e)
 </script>
 
 </html>
