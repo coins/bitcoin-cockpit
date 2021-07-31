@@ -317,8 +317,8 @@ function formatBytesCount(bytesCount) {
  *  Examples
  * 
  */
-$example1.addEventListener('click', _ => {
-    $blockId.value = '000000000000000000020ff2893a89579d3e3db4ae4abbea3b021a11d73a92b3'
+$example1.addEventListener('click', async _ => {
+    $blockId.value = await bitcoinRPC('getbestblockhash')
     getBlock()
 })
 
