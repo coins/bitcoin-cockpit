@@ -97,8 +97,12 @@ function outputToHtml(output, index) {
         <div class="item" label="Value">${output.value} BTC</div>
         <div class="item" label="Address">${output.scriptPubKey.addresses[0]}</div>
     </div>
-    <div class="item" label="scriptPubKey ASM">${output.scriptPubKey.asm}</div>
-    <div class="item" label="scriptPubKey hex">${output.scriptPubKey.hex}</div>
+    ${ output.scriptPubKey ? `
+        <div class="item" label="scriptPubKey ASM">${output.scriptPubKey.asm}</div>
+        <div class="item" label="scriptPubKey hex">${output.scriptPubKey.hex}</div>`
+        :
+        ``
+    }
     <div class="row">
         <div class="item" label="Script Type">${output.scriptPubKey.type}</div>
         <div class="item" label="Required Sigs">${output.scriptPubKey.reqSigs}</div>
