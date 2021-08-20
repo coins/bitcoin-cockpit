@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get New Address</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    textarea {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get New Address</h1>
+        <x-subtitle>Returns a new Bitcoin address for receiving payments. <br>
+            If 'label' is specified, it is added to the address book so payments received with the address will be associated with 'label'.</x-subtitle>
+        <wallet-selector id="$wallet"></wallet-selector>
+        <!-- <div class="row">
+            <div class="item" label="Label">
+                <input id="$label">
+            </div>
+            <div class="item" label="Address Type">
+                <input id="$address_type">
+            </div>
+        </div> -->
+        <div class="row-reverse">
+            <button id="$submit">Create Address</button>
+        </div>
+        <div id="$error" class="error"></div>
+        <div id="$result">
+            <h3>Result</h3>
+            <div id="$address" class="item" label="Address"></div>
+        </div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
+<script>
+async function createAddress() {
+    const wallet = 'wallet/' + $wallet.value
+
+    let address
+    try {
+        address = await bitcoinRPC('getnewaddress', [], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+    $address.textContent = address
+    $result.hidden = false
+}
+$submit.addEventListener('click', e => createAddress())
+
+function resetUI() {
+    $error.textContent = ''
+    $result.hidden = true
+}
+</script>
+
+</html>
