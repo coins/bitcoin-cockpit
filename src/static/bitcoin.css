@@ -186,6 +186,7 @@ pre {
     color: red;
     font-size: 20px;
     white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .warning {

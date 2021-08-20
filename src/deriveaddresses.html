@@ -45,14 +45,18 @@
             <button id="$submit">Derive Addresses</button>
         </div>
         <div class="error" id="$error"></div>
-        <h2>Derived Addresses</h2>
-        <div id="$addresses"></div>
+        <div id="$result" hidden>
+            <h2>Derived Addresses</h2>
+            <div id="$addresses"></div>
+        </div>
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script>
 async function deriveAddresses() {
     // Reset UI
+    // 
+    $result.hidden = true
     $addresses.innerHTML = ''
     $error.textContent = ''
 
@@ -99,6 +103,8 @@ async function deriveAddresses() {
         item.textContent = address
         $addresses.append(item)
     })
+
+    $result.hidden = false
 }
 
 $submit.addEventListener('click', e => deriveAddresses())
@@ -117,9 +123,6 @@ $example2.addEventListener('click', _ => {
     $descriptor.value = `sh(sortedmulti(3,xpub6BG19sAxMMdQP1mcXaDYqkDdoeUQtzw7DHjr9M1rh3vJpcFJJbNUidMsuMbfvMbJ1H9K7boBvaMy1Q1jHa9UXTmzxg3KDto7h6pZpYTrM6Q/0/*,xpub6ATyc4yRJ1vo1JT4Ro5asfBEpEVfFGBFMuHvJhBsbbvGe9pctVarxsPJpeAnsV1zZpzrZ8NFTby9ihMysjsHkHTnDLr9sY6x8k3PuRZF524/0/*,xpub6AAQ7FoVcjpeP8iRFDWRySaEGdLyCA7wHKVGXknKawVkL5dVA3kgrjRfeA1a7DsfSk7MqGEYvv7cCMaK73hCUzfe2tDuc8aNGmXeiSVq43R/0/*,xprv9s21ZrQH143K2bpgrXNezh2wQLmbLXZqvxX21GdCpyJZjvpgy1Y1EMaXCuALw9GWgBi4JVftSdEZTTdEPnAUnTzyCPy88TxF5dvJHsLy14x/0'/0'/0/*,xpub6APdkAEeCs4tv52hCr1tvGTmsN1V3dXpFnBoyaYkrmJ78rosCUuv1pAUoQWPy7R9MubfsaKUQk6x6xvghRXDw4DP4mwNcMs7UVSrDGPmyST/0/*))`
     deriveAddresses()
 })
-
-
-
 </script>
 
 </html>
