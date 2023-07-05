@@ -17,6 +17,12 @@ Bitcoin Cockpit uses Bitcoin's RPC interface. Make sure you read the [security s
 ### Option B: Proxy Bitcoin Core
 - Run a [proxy adding CORS headers](https://github.com/unchained-capital/caravan#adding-cors-headers) (e.g. [nginx](https://www.nginx.com/))
 
+
+### RPC Auth Config
+You can use the following [RPC Auth Config Generator](https://jlopp.github.io/bitcoin-core-rpc-auth-generator/)
+
+
+
 ## List of Commands
 (Not all commands are implemented yet.)
 ```
