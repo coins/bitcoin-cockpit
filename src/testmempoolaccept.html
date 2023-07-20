@@ -39,7 +39,13 @@
 async function testRawTransaction() {
     resetUI()
 
-    const rawTransactions = JSON.parse($input.value.trim())
+    let rawTransactions = $input.value.trim();
+    try{
+        rawTransactions = JSON.parse(rawTransactions)
+    } catch(e){
+        rawTransactions = [rawTransactions]
+    }
+
 
     let result
     try {
@@ -51,7 +57,7 @@ async function testRawTransaction() {
 
     console.log(result)
 
-    $result.textContent = JSON.stringify(result, null, '\t')
+    $result.textContent = JSON.stringify(result, null, 2)
 }
 
 function resetUI() {

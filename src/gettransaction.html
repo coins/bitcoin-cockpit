@@ -51,7 +51,7 @@ async function getTransaction() {
     }
 
     console.log(transaction)
-    $result.textContent = JSON.stringify(transaction, null, '\t')
+    $result.textContent = JSON.stringify(transaction, null, 2)
 }
 
 function resetUI() {
