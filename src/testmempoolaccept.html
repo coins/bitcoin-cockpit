@@ -10,6 +10,9 @@
     textarea {
         height: 160px;
     }
+    .result{
+        white-space: pre-wrap;
+    }
     </style>
 </head>
 
@@ -28,19 +31,19 @@
         </div>
         <h2>Result</h2>
         <div class="error" id="$error"></div>
-        <div class="item" label="Result" id="$result"></div>
+        <div class="item result" label="Result" id="$result"></div>
     </main>
 </body>
 <script src="static/bitcoin-rpc.js"></script>
 <script>
-async function sendRawTransaction() {
+async function testRawTransaction() {
     resetUI()
 
-    const rawTransaction = $input.value.trim()
+    const rawTransactions = JSON.parse($input.value.trim())
 
     let result
     try {
-        result = await bitcoinRPC('testmempoolaccept', [rawTransaction])
+        result = await bitcoinRPC('testmempoolaccept', [rawTransactions])
     } catch (e) {
         $error.textContent = e
         return
@@ -48,7 +51,7 @@ async function sendRawTransaction() {
 
     console.log(result)
 
-    $result.textContent = result
+    $result.textContent = JSON.stringify(result, null, '\t')
 }
 
 function resetUI() {
@@ -56,7 +59,7 @@ function resetUI() {
     $result.textContent = ''
 }
 
-$input.addEventListener('input', e => sendRawTransaction())
+$input.addEventListener('input', e => testRawTransaction())
 </script>
 
 </html>
