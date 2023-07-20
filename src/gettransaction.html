@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Get Transaction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="static/bitcoin.css">
+    <style type="text/css">
+    .result{
+        white-space: pre-wrap;
+        overflow-x: hidden;
+        font-family: monospace;
+    }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="static/bitcoin_logo.svg" width="120">
+    </header>
+    <main>
+        <h1>Get Transaction</h1>
+        <x-subtitle>Get detailed information about in-wallet transaction "txid"
+        </x-subtitle>
+        <wallet-selector id="$wallet"></wallet-selector>
+        <div class="item" label="TXID">
+            <input id="$txid" placeholder="Paste a transaction id" spellcheck="false">
+        </div>
+        <div id="$error" class="error"></div>
+        <div id="$result" class="column result"></div>
+    </main>
+</body>
+<script src="static/bitcoin-rpc.js"></script>
+<script src="wallet-selector.js"></script>
+<script>
+
+async function getTransaction() {
+    resetUI()
+    const wallet = 'wallet/' + $wallet.value
+
+    let transaction
+
+    const txid = $txid.value
+    $result.innerHTML = ''
+    try {
+        transaction = await bitcoinRPC('gettransaction', [txid], wallet)
+    } catch (e) {
+        $error.textContent = e
+        return
+    }
+
+    console.log(transaction)
+    $result.textContent = JSON.stringify(transaction, null, '\t')
+}
+
+function resetUI() {
+    $error.textContent = ''
+    $result.innerHTML = ''
+}
+
+$txid.addEventListener('input', e => getTransaction())
+$wallet.addEventListener('input', e => getTransaction())
+
+</script>
+
+</html>
